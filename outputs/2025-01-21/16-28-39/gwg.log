@@ -1,0 +1,193 @@
+[2025-01-21 16:28:39,556][src.data.my_dataloader][INFO] - Reading csv file from /home/wangqy/Documents/python_test/data/GFP/mutant_7_percentile_0.0_0.3/filtered_dataset.csv
+[2025-01-21 16:28:39,563][src.data.my_dataloader][INFO] - Found 2426 sequences with TRUE scores between 1.29 and 1.56
+[2025-01-21 16:28:39,924][src.data.my_dataloader][INFO] - Clustered 2426 sequences to 130 sequences with scores min=1.30, max=1.56, mean=1.37, std=0.09
+[2025-01-21 16:28:39,931][__main__][INFO] - using GPU: cuda
+[2025-01-21 16:28:39,931][src.model.gwg_module][INFO] - Using device: cuda:0
+[2025-01-21 16:28:40,647][src.model.gwg_module][INFO] - BaseCNN(
+  (encoder): Conv1d(20, 256, kernel_size=(5,), stride=(1,))
+  (embedding): LengthMaxPool1D(
+    (layer): Linear(in_features=256, out_features=512, bias=True)
+  )
+  (decoder): Linear(in_features=512, out_features=1, bias=True)
+  (dropout): Dropout(p=0.0, inplace=False)
+)
+[2025-01-21 16:28:54,978][__main__][INFO] - Done with worker: 0
+[2025-01-21 16:28:54,992][src.data.my_dataloader][INFO] - Added 16963 pairs.
+[2025-01-21 16:28:54,995][__main__][INFO] - Epoch 1 finished in 15.07 seconds
+[2025-01-21 16:28:54,995][__main__][INFO] - ------------------------------------
+[2025-01-21 16:28:54,995][__main__][INFO] - Generated 16963 pairs in this epoch
+[2025-01-21 16:28:54,995][__main__][INFO] - Acceptance rate = 0.16
+[2025-01-21 16:28:55,000][src.data.my_dataloader][INFO] - Added 16963 sequences.
+[2025-01-21 16:29:12,273][src.data.my_dataloader][INFO] - Clustered 16963 sequences to 128 sequences with scores min=1.28, max=1.38, mean=1.34, std=0.02
+[2025-01-21 16:29:12,278][__main__][INFO] - Next dataset = 128 sequences
+[2025-01-21 16:29:12,284][__main__][INFO] - using GPU: cuda
+[2025-01-21 16:29:12,284][src.model.gwg_module][INFO] - Using device: cuda:0
+[2025-01-21 16:29:12,298][src.model.gwg_module][INFO] - BaseCNN(
+  (encoder): Conv1d(20, 256, kernel_size=(5,), stride=(1,))
+  (embedding): LengthMaxPool1D(
+    (layer): Linear(in_features=256, out_features=512, bias=True)
+  )
+  (decoder): Linear(in_features=512, out_features=1, bias=True)
+  (dropout): Dropout(p=0.0, inplace=False)
+)
+[2025-01-21 16:29:24,422][__main__][INFO] - Done with worker: 0
+[2025-01-21 16:29:24,449][src.data.my_dataloader][INFO] - Added 16121 pairs.
+[2025-01-21 16:29:24,452][__main__][INFO] - Epoch 2 finished in 12.17 seconds
+[2025-01-21 16:29:24,452][__main__][INFO] - ------------------------------------
+[2025-01-21 16:29:24,452][__main__][INFO] - Generated 16121 pairs in this epoch
+[2025-01-21 16:29:24,452][__main__][INFO] - Acceptance rate = 0.15
+[2025-01-21 16:29:24,457][src.data.my_dataloader][INFO] - Added 16121 sequences.
+[2025-01-21 16:29:39,420][src.data.my_dataloader][INFO] - Clustered 16121 sequences to 128 sequences with scores min=1.30, max=1.39, mean=1.35, std=0.02
+[2025-01-21 16:29:39,424][__main__][INFO] - Next dataset = 128 sequences
+[2025-01-21 16:29:39,429][__main__][INFO] - using GPU: cuda
+[2025-01-21 16:29:39,429][src.model.gwg_module][INFO] - Using device: cuda:0
+[2025-01-21 16:29:39,437][src.model.gwg_module][INFO] - BaseCNN(
+  (encoder): Conv1d(20, 256, kernel_size=(5,), stride=(1,))
+  (embedding): LengthMaxPool1D(
+    (layer): Linear(in_features=256, out_features=512, bias=True)
+  )
+  (decoder): Linear(in_features=512, out_features=1, bias=True)
+  (dropout): Dropout(p=0.0, inplace=False)
+)
+[2025-01-21 16:29:51,588][__main__][INFO] - Done with worker: 0
+[2025-01-21 16:29:51,627][src.data.my_dataloader][INFO] - Added 15337 pairs.
+[2025-01-21 16:29:51,630][__main__][INFO] - Epoch 3 finished in 12.21 seconds
+[2025-01-21 16:29:51,630][__main__][INFO] - ------------------------------------
+[2025-01-21 16:29:51,630][__main__][INFO] - Generated 15337 pairs in this epoch
+[2025-01-21 16:29:51,630][__main__][INFO] - Acceptance rate = 0.15
+[2025-01-21 16:29:51,634][src.data.my_dataloader][INFO] - Added 15337 sequences.
+[2025-01-21 16:30:05,082][src.data.my_dataloader][INFO] - Clustered 15337 sequences to 128 sequences with scores min=1.31, max=1.40, mean=1.36, std=0.01
+[2025-01-21 16:30:05,086][__main__][INFO] - Next dataset = 128 sequences
+[2025-01-21 16:30:05,092][__main__][INFO] - using GPU: cuda
+[2025-01-21 16:30:05,092][src.model.gwg_module][INFO] - Using device: cuda:0
+[2025-01-21 16:30:05,099][src.model.gwg_module][INFO] - BaseCNN(
+  (encoder): Conv1d(20, 256, kernel_size=(5,), stride=(1,))
+  (embedding): LengthMaxPool1D(
+    (layer): Linear(in_features=256, out_features=512, bias=True)
+  )
+  (decoder): Linear(in_features=512, out_features=1, bias=True)
+  (dropout): Dropout(p=0.0, inplace=False)
+)
+[2025-01-21 16:30:17,236][__main__][INFO] - Done with worker: 0
+[2025-01-21 16:30:17,285][src.data.my_dataloader][INFO] - Added 14855 pairs.
+[2025-01-21 16:30:17,288][__main__][INFO] - Epoch 4 finished in 12.20 seconds
+[2025-01-21 16:30:17,288][__main__][INFO] - ------------------------------------
+[2025-01-21 16:30:17,288][__main__][INFO] - Generated 14855 pairs in this epoch
+[2025-01-21 16:30:17,288][__main__][INFO] - Acceptance rate = 0.14
+[2025-01-21 16:30:17,292][src.data.my_dataloader][INFO] - Added 14855 sequences.
+[2025-01-21 16:30:29,370][src.data.my_dataloader][INFO] - Clustered 14855 sequences to 128 sequences with scores min=1.33, max=1.41, mean=1.37, std=0.01
+[2025-01-21 16:30:29,374][__main__][INFO] - Next dataset = 128 sequences
+[2025-01-21 16:30:29,380][__main__][INFO] - using GPU: cuda
+[2025-01-21 16:30:29,380][src.model.gwg_module][INFO] - Using device: cuda:0
+[2025-01-21 16:30:29,387][src.model.gwg_module][INFO] - BaseCNN(
+  (encoder): Conv1d(20, 256, kernel_size=(5,), stride=(1,))
+  (embedding): LengthMaxPool1D(
+    (layer): Linear(in_features=256, out_features=512, bias=True)
+  )
+  (decoder): Linear(in_features=512, out_features=1, bias=True)
+  (dropout): Dropout(p=0.0, inplace=False)
+)
+[2025-01-21 16:30:41,543][__main__][INFO] - Done with worker: 0
+[2025-01-21 16:30:41,600][src.data.my_dataloader][INFO] - Added 14065 pairs.
+[2025-01-21 16:30:41,603][__main__][INFO] - Epoch 5 finished in 12.23 seconds
+[2025-01-21 16:30:41,603][__main__][INFO] - ------------------------------------
+[2025-01-21 16:30:41,603][__main__][INFO] - Generated 14065 pairs in this epoch
+[2025-01-21 16:30:41,603][__main__][INFO] - Acceptance rate = 0.13
+[2025-01-21 16:30:41,608][src.data.my_dataloader][INFO] - Added 14065 sequences.
+[2025-01-21 16:30:52,313][src.data.my_dataloader][INFO] - Clustered 14065 sequences to 128 sequences with scores min=1.34, max=1.41, mean=1.38, std=0.01
+[2025-01-21 16:30:52,317][__main__][INFO] - Next dataset = 128 sequences
+[2025-01-21 16:30:52,322][__main__][INFO] - using GPU: cuda
+[2025-01-21 16:30:52,323][src.model.gwg_module][INFO] - Using device: cuda:0
+[2025-01-21 16:30:52,331][src.model.gwg_module][INFO] - BaseCNN(
+  (encoder): Conv1d(20, 256, kernel_size=(5,), stride=(1,))
+  (embedding): LengthMaxPool1D(
+    (layer): Linear(in_features=256, out_features=512, bias=True)
+  )
+  (decoder): Linear(in_features=512, out_features=1, bias=True)
+  (dropout): Dropout(p=0.0, inplace=False)
+)
+[2025-01-21 16:31:04,948][__main__][INFO] - Done with worker: 0
+[2025-01-21 16:31:05,018][src.data.my_dataloader][INFO] - Added 13597 pairs.
+[2025-01-21 16:31:05,022][__main__][INFO] - Epoch 6 finished in 12.71 seconds
+[2025-01-21 16:31:05,022][__main__][INFO] - ------------------------------------
+[2025-01-21 16:31:05,022][__main__][INFO] - Generated 13597 pairs in this epoch
+[2025-01-21 16:31:05,022][__main__][INFO] - Acceptance rate = 0.12
+[2025-01-21 16:31:05,027][src.data.my_dataloader][INFO] - Added 13597 sequences.
+[2025-01-21 16:31:15,507][src.data.my_dataloader][INFO] - Clustered 13597 sequences to 128 sequences with scores min=1.35, max=1.42, mean=1.39, std=0.01
+[2025-01-21 16:31:15,511][__main__][INFO] - Next dataset = 128 sequences
+[2025-01-21 16:31:15,516][__main__][INFO] - using GPU: cuda
+[2025-01-21 16:31:15,516][src.model.gwg_module][INFO] - Using device: cuda:0
+[2025-01-21 16:31:15,526][src.model.gwg_module][INFO] - BaseCNN(
+  (encoder): Conv1d(20, 256, kernel_size=(5,), stride=(1,))
+  (embedding): LengthMaxPool1D(
+    (layer): Linear(in_features=256, out_features=512, bias=True)
+  )
+  (decoder): Linear(in_features=512, out_features=1, bias=True)
+  (dropout): Dropout(p=0.0, inplace=False)
+)
+[2025-01-21 16:31:28,104][__main__][INFO] - Done with worker: 0
+[2025-01-21 16:31:28,182][src.data.my_dataloader][INFO] - Added 12590 pairs.
+[2025-01-21 16:31:28,186][__main__][INFO] - Epoch 7 finished in 12.68 seconds
+[2025-01-21 16:31:28,186][__main__][INFO] - ------------------------------------
+[2025-01-21 16:31:28,187][__main__][INFO] - Generated 12590 pairs in this epoch
+[2025-01-21 16:31:28,187][__main__][INFO] - Acceptance rate = 0.11
+[2025-01-21 16:31:28,191][src.data.my_dataloader][INFO] - Added 12590 sequences.
+[2025-01-21 16:31:36,901][src.data.my_dataloader][INFO] - Clustered 12590 sequences to 128 sequences with scores min=1.36, max=1.42, mean=1.40, std=0.01
+[2025-01-21 16:31:36,904][__main__][INFO] - Next dataset = 128 sequences
+[2025-01-21 16:31:36,910][__main__][INFO] - using GPU: cuda
+[2025-01-21 16:31:36,910][src.model.gwg_module][INFO] - Using device: cuda:0
+[2025-01-21 16:31:36,917][src.model.gwg_module][INFO] - BaseCNN(
+  (encoder): Conv1d(20, 256, kernel_size=(5,), stride=(1,))
+  (embedding): LengthMaxPool1D(
+    (layer): Linear(in_features=256, out_features=512, bias=True)
+  )
+  (decoder): Linear(in_features=512, out_features=1, bias=True)
+  (dropout): Dropout(p=0.0, inplace=False)
+)
+[2025-01-21 16:31:49,461][__main__][INFO] - Done with worker: 0
+[2025-01-21 16:31:49,547][src.data.my_dataloader][INFO] - Added 11860 pairs.
+[2025-01-21 16:31:49,551][__main__][INFO] - Epoch 8 finished in 12.65 seconds
+[2025-01-21 16:31:49,551][__main__][INFO] - ------------------------------------
+[2025-01-21 16:31:49,551][__main__][INFO] - Generated 11860 pairs in this epoch
+[2025-01-21 16:31:49,551][__main__][INFO] - Acceptance rate = 0.11
+[2025-01-21 16:31:49,557][src.data.my_dataloader][INFO] - Added 11860 sequences.
+[2025-01-21 16:31:57,171][src.data.my_dataloader][INFO] - Clustered 11860 sequences to 128 sequences with scores min=1.37, max=1.42, mean=1.41, std=0.01
+[2025-01-21 16:31:57,173][__main__][INFO] - Next dataset = 128 sequences
+[2025-01-21 16:31:57,179][__main__][INFO] - using GPU: cuda
+[2025-01-21 16:31:57,179][src.model.gwg_module][INFO] - Using device: cuda:0
+[2025-01-21 16:31:57,186][src.model.gwg_module][INFO] - BaseCNN(
+  (encoder): Conv1d(20, 256, kernel_size=(5,), stride=(1,))
+  (embedding): LengthMaxPool1D(
+    (layer): Linear(in_features=256, out_features=512, bias=True)
+  )
+  (decoder): Linear(in_features=512, out_features=1, bias=True)
+  (dropout): Dropout(p=0.0, inplace=False)
+)
+[2025-01-21 16:32:09,738][__main__][INFO] - Done with worker: 0
+[2025-01-21 16:32:09,834][src.data.my_dataloader][INFO] - Added 11285 pairs.
+[2025-01-21 16:32:09,838][__main__][INFO] - Epoch 9 finished in 12.66 seconds
+[2025-01-21 16:32:09,838][__main__][INFO] - ------------------------------------
+[2025-01-21 16:32:09,838][__main__][INFO] - Generated 11285 pairs in this epoch
+[2025-01-21 16:32:09,838][__main__][INFO] - Acceptance rate = 0.10
+[2025-01-21 16:32:09,843][src.data.my_dataloader][INFO] - Added 11284 sequences.
+[2025-01-21 16:32:16,575][src.data.my_dataloader][INFO] - Clustered 11284 sequences to 128 sequences with scores min=1.38, max=1.42, mean=1.41, std=0.01
+[2025-01-21 16:32:16,578][__main__][INFO] - Next dataset = 128 sequences
+[2025-01-21 16:32:16,584][__main__][INFO] - using GPU: cuda
+[2025-01-21 16:32:16,584][src.model.gwg_module][INFO] - Using device: cuda:0
+[2025-01-21 16:32:16,591][src.model.gwg_module][INFO] - BaseCNN(
+  (encoder): Conv1d(20, 256, kernel_size=(5,), stride=(1,))
+  (embedding): LengthMaxPool1D(
+    (layer): Linear(in_features=256, out_features=512, bias=True)
+  )
+  (decoder): Linear(in_features=512, out_features=1, bias=True)
+  (dropout): Dropout(p=0.0, inplace=False)
+)
+[2025-01-21 16:32:29,147][__main__][INFO] - Done with worker: 0
+[2025-01-21 16:32:29,251][src.data.my_dataloader][INFO] - Added 10646 pairs.
+[2025-01-21 16:32:29,255][__main__][INFO] - Epoch 10 finished in 12.68 seconds
+[2025-01-21 16:32:29,255][__main__][INFO] - ------------------------------------
+[2025-01-21 16:32:29,255][__main__][INFO] - Generated 10646 pairs in this epoch
+[2025-01-21 16:32:29,255][__main__][INFO] - Acceptance rate = 0.09
+[2025-01-21 16:32:29,256][__main__][INFO] - Next dataset = 0 sequences
+[2025-01-21 16:32:30,124][__main__][INFO] - Finished generation in 230.20 seconds.
+[2025-01-21 16:32:30,124][__main__][INFO] - Samples written to /home/wangqy/Documents/python_test/ckpt/GFP/mutant_7/percentile_0.0_0.3/01_21_2025_13_58/temp-0.01-ngibbs-1000-epochs-10/seed_1.csv.

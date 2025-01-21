@@ -1,4 +1,4 @@
-predictor_dir: /home/wangqy/Documents/python_test/ckpt/GFP/mutant_7/percentile_0.0_0.3/01_21_2025_13_43 # needs to be filled in by user
+predictor_dir: /home/wangqy/Documents/python_test/ckpt/GFP/mutant_7/percentile_0.0_0.3/01_21_2025_13_58 # needs to be filled in by user
 temperature: 0.01
 gibbs_samples: 1000 # 1000 instead of 100 for unsmoothed
 verbose: False
