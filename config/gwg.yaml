@@ -1,0 +1,19 @@
+defaults:
+  - _self_
+  - global_paths: default
+  - experiment: gwg/GFP-hard-unsmoothed
+
+run:
+  max_epochs: 10
+  run_name: temp-${experiment.temperature}-ngibbs-${experiment.gibbs_samples}-epochs-${run.max_epochs} #run-name can easily be changed
+  debug: False
+  seed: 1
+  save_cluster_centers: False
+
+data:
+  csv_path: null # must be null
+  cluster_cutoff: 128
+  max_visits: 1
+  clustering: True
+
+task_name: GWG

@@ -1,0 +1,21 @@
+run:
+  max_epochs: 10
+  run_name: temp-${experiment.temperature}-ngibbs-${experiment.gibbs_samples}-epochs-${run.max_epochs}
+  debug: false
+  seed: 1
+  save_cluster_centers: false
+data:
+  csv_path: /home/wangqy/Documents/python_test/data/GFP/mutant_7_percentile_0.0_0.3/filtered_dataset.csv
+  cluster_cutoff: 128
+  max_visits: 1
+  clustering: true
+task_name: GWG
+global_paths:
+  root_dir: ${oc.env:PROJECT_ROOT}
+  data_dir: ${global_paths.root_dir}/data/
+experiment:
+  predictor_dir: /home/wangqy/Documents/python_test/ckpt/GFP/mutant_7/percentile_0.0_0.3/01_21_2025_13_43
+  temperature: 0.01
+  gibbs_samples: 1000
+  verbose: false
+  ckpt_name: last.ckpt

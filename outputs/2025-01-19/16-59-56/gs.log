@@ -1,0 +1,8 @@
+[2025-01-19 16:59:57,002][__main__][INFO] - The base dataset is loaded, which contains 2426 samples.
+[2025-01-19 16:59:57,685][__main__][INFO] - Model parameters have been resumed from the checkpoint.
+[2025-01-19 16:59:57,685][__main__][INFO] - Now we will test if the model is correctly resumed
+[2025-01-19 16:59:59,216][__main__][INFO] - The model is correctly resumed.
+[2025-01-19 16:59:59,567][__main__][INFO] - New sequences are generated! There are 100000 samples
+[2025-01-19 17:00:05,379][__main__][INFO] - Prediction done.Creating KNN graph......
+[2025-01-19 17:02:36,596][__main__][INFO] - KNN graph is done
+[2025-01-19 17:02:39,702][__main__][INFO] - Computing Laplacian..

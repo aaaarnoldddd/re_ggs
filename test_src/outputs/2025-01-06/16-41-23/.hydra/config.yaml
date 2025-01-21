@@ -1,0 +1,15 @@
+model:
+  input_dims: 2
+  output_dims: 1
+training:
+  lr: 0.1
+  epochs: 100
+  batch_size: 32
+data:
+  size: 200
+  std: 0.01
+parameters:
+  w:
+  - 1.0
+  - 2.0
+  b: 3.0

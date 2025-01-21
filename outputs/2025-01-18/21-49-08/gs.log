@@ -1,0 +1,5 @@
+[2025-01-18 21:49:08,200][__main__][INFO] - The base dataset is loaded, which contains 2426 samples.
+[2025-01-18 21:49:09,091][__main__][INFO] - Model parameters have been resumed from the checkpoint.
+[2025-01-18 21:49:09,091][__main__][INFO] - Now we will test if the model is correctly resumed
+[2025-01-18 21:49:11,118][__main__][INFO] - The model is correctly resumed.
+[2025-01-18 21:49:11,470][__main__][INFO] - New sequences are generated! There are 100000 samples

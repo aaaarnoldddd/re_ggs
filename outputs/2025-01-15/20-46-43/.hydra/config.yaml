@@ -1,0 +1,23 @@
+model:
+  input_dims: 2
+  output_dims: 1
+training:
+  lr: 0.1
+  epochs: 100
+  batch_size: 32
+data:
+  size: 200
+  std: 0.01
+parameters:
+  w:
+  - 0.5
+  - 0.6
+  b: 1.0
+root_path: ${oc.env:PROJECT_ROOT}
+callbacks:
+  _target_: pytorch_lightning.callbacks.ModelCheckpoint
+  dirpath: ${root_path}/ckpt/linear
+  filename: linear_pl_model_{epoch:02d}_{train_loss:.2f}
+  monitor: train_loss
+  mode: min
+  save_top_k: 1

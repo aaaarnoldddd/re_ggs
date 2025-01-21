@@ -1,0 +1,9 @@
+defaults:
+  - _self_
+  - experiment: smooth/GFP-hard
+  - global_paths: default.yaml
+
+ckpt_file: last.ckpt
+max_n_seqs: 100_000
+smoothing_method: tik-gamma-1
+exploration_method: ham1

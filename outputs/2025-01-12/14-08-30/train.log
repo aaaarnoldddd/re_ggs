@@ -1,0 +1,10 @@
+[2025-01-12 14:08:30,468][__main__][INFO] - Here we go
+[2025-01-12 14:08:30,469][__main__][INFO] - The current task is GFP
+[2025-01-12 14:08:30,474][__main__][INFO] - The config file will be saved to /home/wangqy/Documents/python_test/ckpt/GFP/mutant_7/quantile_0.0_0.3/01_12_2025_14_08/config.yaml
+[2025-01-12 14:08:30,497][__main__][INFO] - Now start training!
+[2025-01-12 14:08:30,498][src.data.my_dataloader][INFO] - Start preparing dataset
+[2025-01-12 14:08:30,591][src.data.my_dataloader][INFO] - The data between 0.0% and 30.0% will be filterer out, which is between 1.283419251 and 1.5610216855
+[2025-01-12 14:09:31,474][src.data.my_dataloader][INFO] - Dataset done
+[2025-01-12 14:09:31,474][src.data.my_dataloader][INFO] - 2426 samples has been filtered out
+[2025-01-12 14:09:31,510][src.data.my_dataloader][INFO] - Write the dataset to /home/wangqy/Documents/python_test/data//GFP/mutant7_percentile_0.0_0.3/filtered_dataset.csv
+[2025-01-12 14:09:31,519][src.data.my_dataloader][INFO] - Use weighted sampling

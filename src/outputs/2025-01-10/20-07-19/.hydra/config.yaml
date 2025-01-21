@@ -1,0 +1,13 @@
+global_paths:
+  root_dir: ${oc.env:PROJECT_ROOT}
+  data_dir: ${global_paths.root_dir}/data/
+experiment:
+  task: GFP
+  gfp:
+    csv_path: ${global_paths.data_dir}/GFP/ground_truth.csv
+    task_dir: ${global_paths.data_dir}/GFP
+    filter_per:
+    - 0.0
+    - 0.3
+    min_mutani_dist: 7
+    top_quantile: 0.99

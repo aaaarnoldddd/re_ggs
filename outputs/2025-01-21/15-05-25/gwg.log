@@ -1,0 +1,4 @@
+[2025-01-21 15:05:25,254][src.data.my_dataloader][INFO] - Reading csv file from /home/wangqy/Documents/python_test/data/GFP/mutant_7_percentile_0.0_0.3/filtered_dataset.csv
+[2025-01-21 15:05:25,260][src.data.my_dataloader][INFO] - Found 2426 sequences with TRUE scores between 1.29 and 1.56
+[2025-01-21 15:05:25,260][src.data.my_dataloader][INFO] - Clustering with TRUE scores. After this everything is predicted scores.
+[2025-01-21 15:05:25,613][src.data.my_dataloader][INFO] - Clustered 2426 sequences to 130 sequences with scores min=1.30, max=1.56, mean=1.37, std=0.09

@@ -1,0 +1,4 @@
+[2025-01-10 16:08:03,434][__main__][INFO] - Here we go
+[2025-01-10 16:08:03,435][__main__][INFO] - The current task is GFP
+[2025-01-10 16:08:03,436][src.data.my_dataloader][INFO] - Starting preparing dataset
+[2025-01-10 16:08:03,617][src.data.my_dataloader][INFO] - Dataset done

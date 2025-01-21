@@ -1,0 +1,7 @@
+[2025-01-18 15:37:23,791][__main__][INFO] - The base dataset is loaded, which contains 2426 samples.
+[2025-01-18 15:37:24,986][__main__][INFO] - Model parameters have been resumed from the checkpoint.
+[2025-01-18 15:37:24,986][__main__][INFO] - Now we will test if the model is correctly resumed
+[2025-01-18 15:37:25,084][__main__][INFO] - The size of test data is torch.Size([2426, 237])
+[2025-01-18 15:37:27,435][__main__][INFO] - The loss is 0.0069
+[2025-01-18 15:37:27,436][__main__][INFO] - The model is correctly resumed.
+[2025-01-18 15:37:28,039][__main__][INFO] - New sequences are generated! There are 100000 samples
