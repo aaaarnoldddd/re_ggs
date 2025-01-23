@@ -64,7 +64,6 @@ for i, epoch in enumerate(epochs):
     axs[2].text(epoch, gwg[2][i], f"{gwg[2][i]:.2f}", fontsize=9, ha='center', va='bottom', color='brown')
 
 plt.tight_layout()
-plt.savefig('mutant_score_per_epoch_optimized.png', dpi=300)
 plt.savefig("/home/wangqy/Documents/python_test/ckpt/GFP/mutant_7/percentile_0.0_0.3/plot.png")
 plt.show()
 
