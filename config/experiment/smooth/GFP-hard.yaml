@@ -1,4 +1,4 @@
-predictor_dir: /home/wangqy/Documents/python_test/ckpt/GFP/mutant_7/percentile_0.0_0.3/01_21_2025_13_43
+predictor_dir: /home/wangqy/Documents/python_test/ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/01_21_2025_22_47
  #needs to be filled in by user
 save_laplacian: False 
 random_seed: 42

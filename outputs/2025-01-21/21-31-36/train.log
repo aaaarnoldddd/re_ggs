@@ -1,0 +1,5 @@
+[2025-01-21 21:31:36,298][__main__][INFO] - Here we go
+[2025-01-21 21:31:36,299][__main__][INFO] - The current task is GFP
+[2025-01-21 21:31:36,313][__main__][INFO] - The config file will be saved to /home/wangqy/Documents/python_test/ckpt/GFP/mutant_7/percentile_0.0_0.3/tik-gamma-1/01_21_2025_21_31/config.yaml
+[2025-01-21 21:31:36,355][__main__][INFO] - Now start training!
+[2025-01-21 21:31:36,357][src.data.my_dataloader][INFO] - Start preparing dataset

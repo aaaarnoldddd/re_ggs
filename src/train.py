@@ -55,7 +55,8 @@ def main(cfg):
     ckpt_dir = os.path.join(
         cfg.callbacks.dirpath,
         f"mutant_{task_cfg.min_mutant_dist}",
-        f"percentile_{'_'.join([str(x) for x in task_cfg.filter_per])}",   
+        f"percentile_{'_'.join([str(x) for x in task_cfg.filter_percentile])}",   
+        task_cfg.smoothing_params,
         output_dir  
     )
 

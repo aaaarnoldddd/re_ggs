@@ -32,6 +32,7 @@ class my_data_module(LightningDataModule):
         self._alphabet = alphabet
         self._log = logging.getLogger(__name__)
         self._pin_memory=self._task_cfg.pin_memory
+        self._smoothing_params = self._task_cfg.smoothing_params
 
 
     def _encode(self,seq):
@@ -50,14 +51,14 @@ class my_data_module(LightningDataModule):
         return ret
 
         
-
-    def setup(self, stage=None):
-        self._log.info("Start preparing dataset")
+    def setup_unsmoothed(self):
         raw_data = pd.read_csv(self._task_cfg.csv_path)
+
+        self._log.info(f"get data from {self._task_cfg.csv_path}")
 
         raw_nums = raw_data.shape[0]
         top_quantile = self._task_cfg.top_quantile
-        filter_per = [self._task_cfg.filter_per[0],self._task_cfg.filter_per[1]]
+        filter_per = [self._task_cfg.filter_percentile[0],self._task_cfg.filter_percentile[1]]
         min_mutant_dist = self._task_cfg.min_mutant_dist
 
         self._tops = raw_data[raw_data.score >= raw_data.score.quantile(top_quantile)]
@@ -74,7 +75,7 @@ class my_data_module(LightningDataModule):
         self._log.info("Dataset done")
         self._log.info(f"{len(self._dataset)} samples has been filtered out")
 
-        write_dir = os.path.join(self._task_cfg.task_dir, f"mutant_{self._task_cfg.min_mutant_dist}_percentile_{self._task_cfg.filter_per[0]}_{self._task_cfg.filter_per[1]}")
+        write_dir = os.path.join(self._task_cfg.task_dir, f"mutant_{self._task_cfg.min_mutant_dist}_percentile_{self._task_cfg.filter_percentile[0]}_{self._task_cfg.filter_percentile[1]}")
         os.makedirs(write_dir, exist_ok=True)
         write_path = os.path.join(write_dir, f"filtered_dataset.csv")
 
@@ -85,6 +86,55 @@ class my_data_module(LightningDataModule):
                 
         self._log.info(f"Write the dataset to {write_path}")
         df.to_csv(write_path, index=False)
+
+    def setup_smoothed(self):
+        raw_data = pd.read_csv(self._task_cfg.csv_path)
+
+        self._dataset = [(self._encode(x),np.float32(y)) for x,y in zip(raw_data.sequence, raw_data.score)]
+        
+        self._log.info(f"get data from {self._task_cfg.csv_path}")
+        self._log.info(f'Read in {len(self._dataset)} smoothed sequences.')
+
+    def setup(self, stage=None):
+        self._log.info("Start preparing dataset")
+
+        if self._smoothing_params == 'unsmoothed':
+            self.setup_unsmoothed()
+        else:
+            self.setup_smoothed()
+
+        # raw_data = pd.read_csv(self._task_cfg.csv_path)
+
+        # raw_nums = raw_data.shape[0]
+        # top_quantile = self._task_cfg.top_quantile
+        # filter_per = [self._task_cfg.filter_per[0],self._task_cfg.filter_per[1]]
+        # min_mutant_dist = self._task_cfg.min_mutant_dist
+
+        # self._tops = raw_data[raw_data.score >= raw_data.score.quantile(top_quantile)]
+
+        # self._log.info(f"The data between {filter_per[0]*100}% and {filter_per[1]*100}% will be filterer out, which is between {raw_data.score.quantile(filter_per[0])} and {raw_data.score.quantile(filter_per[1])}")
+
+        # filtered = raw_data[raw_data.score.between(raw_data.score.quantile(filter_per[0]), raw_data.score.quantile(filter_per[1]))]
+
+        # new_data = [(self._encode(x),np.float32(y)) for x,y in 
+        #             tqdm(zip(filtered.sequence, filtered.score), desc="Processing sequences", total=len(filtered),leave=True)
+        #             if self._get_min_dist(x) >= min_mutant_dist]
+
+        # self._dataset=new_data
+        # self._log.info("Dataset done")
+        # self._log.info(f"{len(self._dataset)} samples has been filtered out")
+
+        # write_dir = os.path.join(self._task_cfg.task_dir, f"mutant_{self._task_cfg.min_mutant_dist}_percentile_{self._task_cfg.filter_per[0]}_{self._task_cfg.filter_per[1]}")
+        # os.makedirs(write_dir, exist_ok=True)
+        # write_path = os.path.join(write_dir, f"filtered_dataset.csv")
+
+        # df = pd.DataFrame({
+        #     "sequence": [self._decode(seq) for seq, _ in new_data],
+        #     "score": [score for _, score in new_data]
+        # })
+                
+        # self._log.info(f"Write the dataset to {write_path}")
+        # df.to_csv(write_path, index=False)
 
         self._log.info(f"Use weighted sampling")
         targets = [item[1] for item in self._dataset]  

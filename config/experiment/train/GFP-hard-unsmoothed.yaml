@@ -1,8 +1,10 @@
+seq_len: 237
 task_name: GFP
 gfp:
   csv_path: ${global_paths.data_dir}/GFP/ground_truth.csv
   task_dir: ${global_paths.data_dir}/GFP
-  filter_per: [0.0, 0.3]
+  filter_percentile: [0.0, 0.3]
   min_mutant_dist: 7
   top_quantile: 0.99
   pin_memory: True
+  smoothing_params: unsmoothed

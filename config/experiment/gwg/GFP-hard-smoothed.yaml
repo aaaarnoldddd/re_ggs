@@ -1,0 +1,10 @@
+predictor_dir: /home/wangqy/Documents/python_test/ckpt/GFP/mutant_7/percentile_0.0_0.3/tik-gamma-1/01_21_2025_23_17 # needs to be filled in by user
+temperature: 0.1
+gibbs_samples: 1000
+verbose: False
+ckpt_name: last.ckpt
+
+
+
+
+

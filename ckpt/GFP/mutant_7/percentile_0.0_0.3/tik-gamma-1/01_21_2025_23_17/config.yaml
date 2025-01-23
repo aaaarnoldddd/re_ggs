@@ -1,0 +1,44 @@
+task_name: ${experiment.task_name}
+data:
+  task: ${task_name}
+  batch_size: 1024
+  num_workers: 8
+  seed: 420
+  alphabet: ARNDCQEGHILKMFPSTWYV
+  sequence_column: sequence
+  weighted_sampling: true
+model:
+  optimizer:
+    lr: 0.0001
+    weight_decay: 0.0001
+callbacks:
+  _target_: pytorch_lightning.callbacks.ModelCheckpoint
+  dirpath: /home/wangqy/Documents/python_test/ckpt/GFP/mutant_7/percentile_0.0_0.3/tik-gamma-1/01_21_2025_23_17
+  filename: epoch_{epoch:03d}
+  monitor: train_sr
+  mode: max
+  save_top_k: 1
+  save_last: true
+trainer:
+  max_epochs: 100
+  accelerator: gpu
+  log_every_n_steps: 1
+global_paths:
+  root_dir: ${oc.env:PROJECT_ROOT}
+  data_dir: ${global_paths.root_dir}/data/
+experiment:
+  seq_len: 237
+  task_name: GFP
+  gfp:
+    csv_path: /home/wangqy/Documents/python_test/data/GFP/mutant_7_percentile_0.0_0.3/tik-gamma-10/ham1_n-250K/re_01_21_2025_23_13.csv
+    task_dir: ${global_paths.data_dir}/GFP
+    filter_percentile:
+    - 0.0
+    - 0.3
+    min_mutant_dist: 7
+    top_quantile: 0.99
+    pin_memory: true
+    smoothing_params: tik-gamma-1
+    nbhd_params: ham1_n-250K
+    smoothed_fname: results
+    output_dir: null

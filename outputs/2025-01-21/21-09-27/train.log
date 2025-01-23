@@ -1,0 +1,6 @@
+[2025-01-21 21:09:27,643][__main__][INFO] - Here we go
+[2025-01-21 21:09:27,643][__main__][INFO] - The current task is GFP
+[2025-01-21 21:09:27,648][__main__][INFO] - The config file will be saved to /home/wangqy/Documents/python_test/ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/01_21_2025_21_09/config.yaml
+[2025-01-21 21:09:27,673][__main__][INFO] - Now start training!
+[2025-01-21 21:09:27,673][src.data.my_dataloader][INFO] - Start preparing dataset
+[2025-01-21 21:09:27,772][src.data.my_dataloader][INFO] - get data from /home/wangqy/Documents/python_test/data//GFP/ground_truth.csv

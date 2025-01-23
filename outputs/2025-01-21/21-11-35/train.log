@@ -1,0 +1,11 @@
+[2025-01-21 21:11:35,579][__main__][INFO] - Here we go
+[2025-01-21 21:11:35,579][__main__][INFO] - The current task is GFP
+[2025-01-21 21:11:35,586][__main__][INFO] - The config file will be saved to /home/wangqy/Documents/python_test/ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/01_21_2025_21_11/config.yaml
+[2025-01-21 21:11:35,612][__main__][INFO] - Now start training!
+[2025-01-21 21:11:35,612][src.data.my_dataloader][INFO] - Start preparing dataset
+[2025-01-21 21:11:35,707][src.data.my_dataloader][INFO] - get data from /home/wangqy/Documents/python_test/data//GFP/ground_truth.csv
+[2025-01-21 21:11:35,711][src.data.my_dataloader][INFO] - The data between 0.0% and 30.0% will be filterer out, which is between 1.283419251 and 1.5610216855
+[2025-01-21 21:12:36,589][src.data.my_dataloader][INFO] - Dataset done
+[2025-01-21 21:12:36,589][src.data.my_dataloader][INFO] - 2426 samples has been filtered out
+[2025-01-21 21:12:36,628][src.data.my_dataloader][INFO] - Write the dataset to /home/wangqy/Documents/python_test/data//GFP/mutant_7_percentile_0.0_0.3/filtered_dataset.csv
+[2025-01-21 21:12:36,637][src.data.my_dataloader][INFO] - Use weighted sampling

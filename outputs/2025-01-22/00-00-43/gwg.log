@@ -1,0 +1,20 @@
+[2025-01-22 00:00:43,881][src.data.my_dataloader][INFO] - Reading csv file from /home/wangqy/Documents/python_test/data/GFP/mutant_7_percentile_0.0_0.3/filtered_dataset.csv
+[2025-01-22 00:00:43,888][src.data.my_dataloader][INFO] - Found 2426 sequences with TRUE scores between 1.29 and 1.56
+[2025-01-22 00:00:44,240][src.data.my_dataloader][INFO] - Clustered 2426 sequences to 130 sequences with scores min=1.30, max=1.56, mean=1.37, std=0.09
+[2025-01-22 00:00:44,247][__main__][INFO] - using GPU: cuda
+[2025-01-22 00:00:44,247][src.model.gwg_module][INFO] - Using device: cuda:0
+[2025-01-22 00:00:44,947][src.model.gwg_module][INFO] - BaseCNN(
+  (encoder): Conv1d(20, 256, kernel_size=(5,), stride=(1,))
+  (embedding): LengthMaxPool1D(
+    (layer): Linear(in_features=256, out_features=512, bias=True)
+  )
+  (decoder): Linear(in_features=512, out_features=1, bias=True)
+  (dropout): Dropout(p=0.0, inplace=False)
+)
+[2025-01-22 00:00:59,577][__main__][INFO] - Done with worker: 0
+[2025-01-22 00:00:59,608][src.data.my_dataloader][INFO] - Added 41868 pairs.
+[2025-01-22 00:00:59,615][__main__][INFO] - Epoch 1 finished in 15.37 seconds
+[2025-01-22 00:00:59,615][__main__][INFO] - ------------------------------------
+[2025-01-22 00:00:59,615][__main__][INFO] - Generated 41868 pairs in this epoch
+[2025-01-22 00:00:59,615][__main__][INFO] - Acceptance rate = 0.56
+[2025-01-22 00:00:59,626][src.data.my_dataloader][INFO] - Added 41868 sequences.

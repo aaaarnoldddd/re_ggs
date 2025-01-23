@@ -1,0 +1,3 @@
+[2025-01-21 22:55:38,658][__main__][INFO] - The base dataset is loaded, which contains 2426 samples.
+[2025-01-21 22:55:39,345][__main__][INFO] - Model parameters have been resumed from the checkpoint.
+[2025-01-21 22:55:39,345][__main__][INFO] - Now we will test if the model is correctly resumed

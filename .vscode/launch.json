@@ -10,7 +10,7 @@
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
-            
+            // "args": ["experiment=train/GFP-hard-smoothed"],
             "console": "integratedTerminal"
         }
     ]

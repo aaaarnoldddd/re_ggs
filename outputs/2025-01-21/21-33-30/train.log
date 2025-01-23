@@ -1,0 +1,8 @@
+[2025-01-21 21:33:30,608][__main__][INFO] - Here we go
+[2025-01-21 21:33:30,608][__main__][INFO] - The current task is GFP
+[2025-01-21 21:33:30,613][__main__][INFO] - The config file will be saved to /home/wangqy/Documents/python_test/ckpt/GFP/mutant_7/percentile_0.0_0.3/tik-gamma-1/01_21_2025_21_33/config.yaml
+[2025-01-21 21:33:30,640][__main__][INFO] - Now start training!
+[2025-01-21 21:33:30,641][src.data.my_dataloader][INFO] - Start preparing dataset
+[2025-01-21 21:33:33,113][src.data.my_dataloader][INFO] - get data from data/GFP/mutant_7_percentile_0.0_0.3/tik-gamma-1/ham1_n-100K/re_01_21_2025_21_25.csv
+[2025-01-21 21:33:33,113][src.data.my_dataloader][INFO] - Read in 100000 smoothed sequences.
+[2025-01-21 21:33:33,115][src.data.my_dataloader][INFO] - Use weighted sampling

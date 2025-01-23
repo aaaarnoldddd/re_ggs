@@ -211,12 +211,17 @@ def main(cfg):
     alphabet = train_config.data.alphabet
     base_data_path = os.path.join(
         task_cfg.task_dir,
-        f"mutant_{task_cfg.min_mutant_dist}_percentile_{task_cfg.filter_per[0]}_{task_cfg.filter_per[1]}",
+        f"mutant_{task_cfg.min_mutant_dist}_percentile_{task_cfg.filter_percentile[0]}_{task_cfg.filter_percentile[1]}",
         f"filtered_dataset.csv"
     )
 
     # print(base_data_path)
     base_data = pd.read_csv(base_data_path)
+    # gt_data_path = os.path.join(
+    #     task_cfg.task_dir,
+    #     "ground_truth.csv"
+    # ) 
+    # gt_data = pd.read_csv(gt_data_path)
 
     log.info(f"The base dataset is loaded, which contains {base_data.shape[0]} samples.")
 
@@ -244,7 +249,7 @@ def main(cfg):
 
     write_dir = os.path.join(
         train_config.experiment.gfp.task_dir, 
-        f"mutant_{train_config.experiment.gfp.min_mutant_dist}_percentile_{train_config.experiment.gfp.filter_per[0]}_{train_config.experiment.gfp.filter_per[1]}",
+        f"mutant_{train_config.experiment.gfp.min_mutant_dist}_percentile_{train_config.experiment.gfp.filter_percentile[0]}_{train_config.experiment.gfp.filter_percentile[1]}",
         cfg.smoothing_method, 
         f"{cfg.exploration_method}_n-{cfg.max_n_seqs // 1000}K"
         )
@@ -267,6 +272,7 @@ def main(cfg):
     restored_data.to_csv(re_write_path, index=None)
     with open(con_write_path, 'w') as f:
         OmegaConf.save(config=cfg, f=f)
+    log.info(f"smoothed data is restored at {re_write_path}")
 
 
 

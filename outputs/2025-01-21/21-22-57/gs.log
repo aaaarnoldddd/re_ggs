@@ -1,0 +1,9 @@
+[2025-01-21 21:22:57,566][__main__][INFO] - The base dataset is loaded, which contains 2426 samples.
+[2025-01-21 21:22:58,263][__main__][INFO] - Model parameters have been resumed from the checkpoint.
+[2025-01-21 21:22:58,263][__main__][INFO] - Now we will test if the model is correctly resumed
+[2025-01-21 21:22:59,799][__main__][INFO] - The model is correctly resumed.
+[2025-01-21 21:23:00,190][__main__][INFO] - New sequences are generated! There are 100000 samples
+[2025-01-21 21:23:06,171][__main__][INFO] - Prediction done.Creating KNN graph......
+[2025-01-21 21:25:45,896][__main__][INFO] - KNN graph is done
+[2025-01-21 21:25:47,955][__main__][INFO] - Computing Laplacian..
+[2025-01-21 21:25:48,992][__main__][INFO] - smoothed data is restored at /home/wangqy/Documents/python_test/data//GFP/mutant_7_percentile_0.0_0.3/tik-gamma-1/ham1_n-100K/re_01_21_2025_21_25.csv

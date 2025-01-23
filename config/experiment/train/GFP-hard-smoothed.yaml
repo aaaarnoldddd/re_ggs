@@ -1,0 +1,13 @@
+seq_len: 237
+task_name: GFP
+gfp:
+  csv_path: /home/wangqy/Documents/python_test/data/GFP/mutant_7_percentile_0.0_0.3/tik-gamma-10/ham1_n-250K/re_01_21_2025_23_13.csv # needs to be filled
+  task_dir: ${global_paths.data_dir}/GFP
+  filter_percentile: [0.0, 0.3]
+  min_mutant_dist: 7
+  top_quantile: 0.99
+  pin_memory: True
+  smoothing_params: tik-gamma-1 #for example
+  nbhd_params: ham1_n-250K #for example
+  smoothed_fname: results #for example
+  output_dir: null #one extra layer for naming different runs with the same parameters. Defaults to a timestamp
