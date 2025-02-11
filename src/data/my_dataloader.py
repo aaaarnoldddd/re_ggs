@@ -9,6 +9,7 @@ from torch.utils.data import Dataset,DataLoader,WeightedRandomSampler
 import logging
 from tqdm import tqdm
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
+from utils import get_sol_entrance, get_ogt_entrance, get_ogt_model
 
 class my_data_module(LightningDataModule):
     def __init__(
@@ -67,25 +68,39 @@ class my_data_module(LightningDataModule):
 
         filtered = raw_data[raw_data.score.between(raw_data.score.quantile(filter_per[0]), raw_data.score.quantile(filter_per[1]))]
 
-        new_data = [(self._encode(x),np.float32(y)) for x,y in 
+        # filtered = filtered[:50]
+
+        new_data = [(x, np.float32(y)) 
+                    for x,y in 
                     tqdm(zip(filtered.sequence, filtered.score), desc="Processing sequences", total=len(filtered),leave=True)
                     if self._get_min_dist(x) >= min_mutant_dist]
 
-        self._dataset=new_data
+        pred_sol = get_sol_entrance([x[0] for x in new_data])
+        pred_ogt = get_ogt_entrance([x[0] for x in new_data])
+
+        self._dataset = [(self._encode(x[0]), (x[1], np.float32(y), np.float32(z)))
+                         for x, y, z in
+                         zip(new_data, pred_sol, pred_ogt)]
+        
+        # self._dataset = self._dataset[:100]
+        
         self._log.info("Dataset done")
         self._log.info(f"{len(self._dataset)} samples has been filtered out")
 
         write_dir = os.path.join(self._task_cfg.task_dir, f"mutant_{self._task_cfg.min_mutant_dist}_percentile_{self._task_cfg.filter_percentile[0]}_{self._task_cfg.filter_percentile[1]}")
         os.makedirs(write_dir, exist_ok=True)
-        write_path = os.path.join(write_dir, f"filtered_dataset.csv")
+        write_path = os.path.join(write_dir, f"filtered_dataset_with_ogtsol.csv")
 
         df = pd.DataFrame({
-            "sequence": [self._decode(seq) for seq, _ in new_data],
-            "score": [score for _, score in new_data]
+            "sequence": [self._decode(seq) for seq, _ in self._dataset],
+            "score": [x[0] for _, x in self._dataset],
+            "sol": [x[1] for _, x in self._dataset],
+            "OGT": [x[2] for _, x in self._dataset]
         })
                 
         self._log.info(f"Write the dataset to {write_path}")
         df.to_csv(write_path, index=False)
+        self._log.info(f"training size is {len(self._dataset)}")
 
     def setup_smoothed(self):
         raw_data = pd.read_csv(self._task_cfg.csv_path)
@@ -95,52 +110,47 @@ class my_data_module(LightningDataModule):
         self._log.info(f"get data from {self._task_cfg.csv_path}")
         self._log.info(f'Read in {len(self._dataset)} smoothed sequences.')
 
+    def setup_(self):
+        raw_data = pd.read_csv("data/GFP/mutant_7_percentile_0.0_0.3/filtered_dataset_with_ogtsol.csv")
+        self._dataset = [(self._encode(x), (np.float32(y), np.float32(z), np.float32(p))) 
+                        for x,y,z,p
+                        in zip(raw_data.sequence, raw_data.score, raw_data.sol, raw_data.OGT)]
+        
+        # self._dataset = self._dataset[:10]
+        self._log.info(f'Read in {len(self._dataset)} smoothed sequences.')
+
     def setup(self, stage=None):
         self._log.info("Start preparing dataset")
 
+
         if self._smoothing_params == 'unsmoothed':
-            self.setup_unsmoothed()
+            # self.setup_unsmoothed()
+            self.setup_()
+    
         else:
             self.setup_smoothed()
 
-        # raw_data = pd.read_csv(self._task_cfg.csv_path)
-
-        # raw_nums = raw_data.shape[0]
-        # top_quantile = self._task_cfg.top_quantile
-        # filter_per = [self._task_cfg.filter_per[0],self._task_cfg.filter_per[1]]
-        # min_mutant_dist = self._task_cfg.min_mutant_dist
-
-        # self._tops = raw_data[raw_data.score >= raw_data.score.quantile(top_quantile)]
-
-        # self._log.info(f"The data between {filter_per[0]*100}% and {filter_per[1]*100}% will be filterer out, which is between {raw_data.score.quantile(filter_per[0])} and {raw_data.score.quantile(filter_per[1])}")
-
-        # filtered = raw_data[raw_data.score.between(raw_data.score.quantile(filter_per[0]), raw_data.score.quantile(filter_per[1]))]
-
-        # new_data = [(self._encode(x),np.float32(y)) for x,y in 
-        #             tqdm(zip(filtered.sequence, filtered.score), desc="Processing sequences", total=len(filtered),leave=True)
-        #             if self._get_min_dist(x) >= min_mutant_dist]
-
-        # self._dataset=new_data
-        # self._log.info("Dataset done")
-        # self._log.info(f"{len(self._dataset)} samples has been filtered out")
-
-        # write_dir = os.path.join(self._task_cfg.task_dir, f"mutant_{self._task_cfg.min_mutant_dist}_percentile_{self._task_cfg.filter_per[0]}_{self._task_cfg.filter_per[1]}")
-        # os.makedirs(write_dir, exist_ok=True)
-        # write_path = os.path.join(write_dir, f"filtered_dataset.csv")
-
-        # df = pd.DataFrame({
-        #     "sequence": [self._decode(seq) for seq, _ in new_data],
-        #     "score": [score for _, score in new_data]
-        # })
-                
-        # self._log.info(f"Write the dataset to {write_path}")
-        # df.to_csv(write_path, index=False)
-
         self._log.info(f"Use weighted sampling")
-        targets = [item[1] for item in self._dataset]  
-        targets = np.array(targets)
-        adjusted_targets = targets - targets.min() + 1
-        weights = 1 / adjusted_targets
+        targets = [item[1] for item in self._dataset]  # (x[1], y, z)
+        targets = np.array(targets)  # 转换为 numpy 数组，形状 (N, 3)
+
+        # 方法1: 取 target 平均值
+        # combined_targets = targets.mean(axis=1)  
+
+        # 方法2: 取最大值
+        # combined_targets = targets.max(axis=1)
+
+        # 方法3: 自定义加权平均 (调整 a, b, c)
+        a, b, c = 0.6, 0.2, 0.2  # 你可以调整权重
+        sum = targets.sum(axis=0)
+        targets = targets/sum
+        combined_targets = a * targets[:, 0] + b * targets[:, 1] + c * targets[:, 2]
+
+        # 计算采样权重
+        adjusted_targets = combined_targets - combined_targets.min() + 1  # 避免除 0
+        weights = 1 / adjusted_targets  # 目标值越大，权重越小（即越容易被采样）
+
+        # 创建 WeightedRandomSampler
         self._sampler = WeightedRandomSampler(weights, len(weights))
 
     def train_dataloader(self):

@@ -22,32 +22,23 @@ pyrootutils.setup_root(
 
 from src.data import my_data_module
 from src.model import my_predictor_module
+from src.model import MTL_Module
+from utils import get_sol_entrance, get_ogt_entrance
 
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 @hydra.main(version_base=None , config_path="../config/" , config_name="train.yaml")
 def main(cfg):
-    print("CONFIG")
-    print(OmegaConf.to_yaml(cfg, resolve=True))
-    log.info("Here we go")
+    # print("CONFIG")
+    # print(OmegaConf.to_yaml(cfg, resolve=True))
+    # log.info("Here we go")
     task = cfg.task_name
     task_cfg = cfg.experiment.gfp
-    log.info(f"The current task is {task}")
+    # log.info(f"The current task is {task}")
     data_module = my_data_module(task_cfg = task_cfg, **cfg.data)
-    # data_module.setup()
-    
-    # print(type(data_module._dataset))   
 
-    # test_loader = data_module.train_dataloader()
-
-    # for batches, (feature, target) in enumerate(test_loader):
-    #     print(f"batches {batches}")
-    #     print(f"features {feature.shape}")
-    #     print(f"target {target.shape}")
-    #     break
-
-    predictor_module = my_predictor_module(cfg.model)
+    predictor_module = MTL_Module(cfg.model.mtl, cfg.model.optimizer)
 
     output_dir = datetime.now().strftime("%m_%d_%Y_%H_%M") 
 
@@ -73,11 +64,13 @@ def main(cfg):
 
     callbacks_module = hydra.utils.instantiate(cfg.callbacks)
 
-    trainer = Trainer(**cfg.trainer, callbacks = callbacks_module, devices=[torch.cuda.current_device()])
+    # trainer = Trainer(**cfg.trainer, callbacks = callbacks_module, devices=[torch.cuda.current_device()])
+    trainer = Trainer(**cfg.trainer, devices=[torch.cuda.current_device()])
 
     log.info(f"Now start training!")
 
     trainer.fit(model = predictor_module, datamodule = data_module)
+
 
 
 

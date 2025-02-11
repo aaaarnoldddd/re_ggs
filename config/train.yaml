@@ -15,20 +15,38 @@ data:
   weighted_sampling: True
 
 model:
+  mtl:
+    n_tokens: 20
+    kernel_size: 5
+    input_size: 256
+    dropout: 0.1
+    make_one_hot: True
+    activation: relu
+    linear: True
+    num_tasks: 3  # 多任务：预测 3 个适应度指标
+    num_experts: 5
+    expert_hidden_units: [128, 64]
+    gate_hidden_units: [64]
+    tower_hidden_units: [64, 64]
+    hidden_activations: relu
+    net_dropout: 0.1
+    batch_norm: False
+    learning_rate: 1e-3
   optimizer:
-    lr: 0.0001
+    lr: 0.001
     weight_decay: 0.0001
 
 callbacks:
   _target_: pytorch_lightning.callbacks.ModelCheckpoint
   dirpath: ${global_paths.root_dir}/ckpt/${data.task}
   filename: epoch_{epoch:03d}
-  monitor: train_sr
-  mode: max
+  monitor: train_loss
+  mode: min
   save_top_k: 1
   save_last: True
+  save_on_train_epoch_end: True
   
 trainer:
-  max_epochs: 100
+  max_epochs: 200
   accelerator: gpu
   log_every_n_steps: 1

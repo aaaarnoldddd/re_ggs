@@ -1,0 +1,6 @@
+[2025-02-11 02:41:48,753][__main__][INFO] - The config file will be saved to /home/wangqy/Documents/python_test/ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_11_2025_02_41/config.yaml
+[2025-02-11 02:41:48,790][__main__][INFO] - Now start training!
+[2025-02-11 02:41:48,790][src.data.my_dataloader][INFO] - Start preparing dataset
+[2025-02-11 02:41:48,855][src.data.my_dataloader][INFO] - Read in 10 smoothed sequences.
+[2025-02-11 02:41:48,856][src.data.my_dataloader][INFO] - Use weighted sampling
+[2025-02-11 02:41:50,675][src.model.mtl_predicotor][INFO] - Best train loss during training: 148.370880

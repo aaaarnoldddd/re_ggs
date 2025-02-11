@@ -15,35 +15,35 @@ pyrootutils.setup_root(
     pythonpath= True
 )
 
-# data = pd.read_csv("data/GFP/ground_truth.csv")
-# print(data.shape[0])
-# x = data.score.quantile(0.999)
-# y = data.score.quantile(0.900)
-# print(x,y)
+data = pd.read_csv("data/GFP/ground_truth.csv")
+print(data.shape[0])
+x = data.score.quantile(0.999)
+y = data.score.quantile(0.900)
+print(x,y)
 
-# data=data.reset_index(drop=True)
+data=data[:10]
 
-# nnn = [(x,y) for x,y in zip(data.sequence, data.score)]
+nnn = [(x,y) for x,y in zip(data.sequence, data.score)]
 
-# # nnn=nnn.reset_index(drop=True)
+# nnn=nnn.reset_index(drop=True)
 
-# sequence = data.sequence
+sequence = data.sequence
 
-# for x in nnn:
-#     print(x)
+for x in nnn:
+    print(x)
 
-# sequence = sequence.tolist()
+sequence = sequence.tolist()
 
-# print(type(nnn))
+print(type(nnn))
 
-# df = pd.DataFrame({
-#             "sequence": [seq for seq, _ in nnn],
-#             "score": [score for _, score in nnn]
-#         })
+df = pd.DataFrame({
+            "sequence": [seq for seq, _ in nnn],
+            "score": [score for _, score in nnn]
+        })
 
-# print(df)
-# print(data)
-# # print(nnn[4])
+print(df)
+print(data)
+# print(nnn[4])
 
 # tot = sum(1 for (_, x) in nnn if x < 0)
 

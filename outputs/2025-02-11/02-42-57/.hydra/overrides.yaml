@@ -1,0 +1,4 @@
+- model.mtl.kernel_size=5
+- model.mtl.learning_rate=0.0005
+- model.mtl.net_dropout=0.1
+- model.mtl.expert_hidden_units=[256, 128]
