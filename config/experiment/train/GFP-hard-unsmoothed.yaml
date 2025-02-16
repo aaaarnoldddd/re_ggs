@@ -8,3 +8,5 @@ gfp:
   top_quantile: 0.99
   pin_memory: True
   smoothing_params: unsmoothed
+  val_ratio: 0.2
+  test_ratio: 0.1

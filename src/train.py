@@ -64,12 +64,13 @@ def main(cfg):
 
     callbacks_module = hydra.utils.instantiate(cfg.callbacks)
 
-    # trainer = Trainer(**cfg.trainer, callbacks = callbacks_module, devices=[torch.cuda.current_device()])
-    trainer = Trainer(**cfg.trainer, devices=[torch.cuda.current_device()])
+    trainer = Trainer(**cfg.trainer, callbacks = callbacks_module, devices=[torch.cuda.current_device()])
+    # trainer = Trainer(**cfg.trainer, devices=[torch.cuda.current_device()])
 
     log.info(f"Now start training!")
 
     trainer.fit(model = predictor_module, datamodule = data_module)
+    trainer.test(model = predictor_module, datamodule = data_module)
 
 
 

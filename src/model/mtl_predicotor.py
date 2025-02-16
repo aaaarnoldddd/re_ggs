@@ -243,7 +243,16 @@ class MTL_Module(LightningModule):
         self.train_sr_metric_1 = SpearmanCorrCoef()
         self.train_sr_metric_2 = SpearmanCorrCoef()
         self.train_sr_metric_3 = SpearmanCorrCoef()
-
+        # 验证集指标
+        self.val_loss_metric = MeanMetric()
+        self.val_sr_metric_1 = SpearmanCorrCoef()
+        self.val_sr_metric_2 = SpearmanCorrCoef()
+        self.val_sr_metric_3 = SpearmanCorrCoef()
+        # **测试集指标**
+        self.test_loss_metric = MeanMetric()
+        self.test_sr_metric_1 = SpearmanCorrCoef()
+        self.test_sr_metric_2 = SpearmanCorrCoef()
+        self.test_sr_metric_3 = SpearmanCorrCoef()
         self._log = logging.getLogger(__name__)
         self.best_train_loss = float('inf')
     
@@ -287,6 +296,96 @@ class MTL_Module(LightningModule):
             self.best_train_loss = loss.item()
         return loss
     
+    def validation_step(self, batch, batch_idx):
+        """
+        验证集的计算逻辑，过程类似训练，但不需要反向传播。
+        Lightning 会自动在每个 epoch 的验证阶段调用此方法。
+        """
+        features, targets = batch
+        pred_dict = self.forward(features)
+        
+        preds = torch.cat([pred_dict[f"task{i+1}_pred"] for i in range(self.mcfg.num_tasks)], dim=1)
+        targets = torch.stack([torch.tensor(t) for t in targets]).transpose(0, 1)
+
+        w1, w2, w3 = 0.6, 0.2, 0.2
+        loss1 = self.criterion(preds[:, 0], targets[:, 0])
+        loss2 = self.criterion(preds[:, 1], targets[:, 1])
+        loss3 = self.criterion(preds[:, 2], targets[:, 2])
+        loss = w1 * loss1 + w2 * loss2 + w3 * loss3
+        
+        # 更新 val loss
+        self.val_loss_metric(loss)
+
+        # Spearman
+        sr_val_1 = self.val_sr_metric_1(pred_dict["task1_pred"].squeeze(), targets[:, 0])
+        sr_val_2 = self.val_sr_metric_2(pred_dict["task2_pred"].squeeze(), targets[:, 1])
+        sr_val_3 = self.val_sr_metric_3(pred_dict["task3_pred"].squeeze(), targets[:, 2])
+        avg_sr = (sr_val_1 + sr_val_2 + sr_val_3) / 3
+        
+        # 这里用 self.log 记录验证指标, on_epoch=True 表示在 epoch_end 汇总
+        self.log("val_loss", self.val_loss_metric, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("val_sr", avg_sr, on_step=False, on_epoch=True, prog_bar=True)
+
+        return loss 
+
+    def test_step(self, batch, batch_idx):
+        """
+        处理测试集，每个 batch 计算 loss 和 spearman 相关系数
+        """
+        features, targets = batch
+        pred_dict = self.forward(features)
+
+        preds = torch.cat([pred_dict[f"task{i+1}_pred"] for i in range(self.mcfg.num_tasks)], dim=1)
+        targets = torch.stack([torch.tensor(t) for t in targets]).transpose(0, 1)
+
+        w1, w2, w3 = 0.6, 0.2, 0.2
+        loss1 = self.criterion(preds[:, 0], targets[:, 0])
+        loss2 = self.criterion(preds[:, 1], targets[:, 1])
+        loss3 = self.criterion(preds[:, 2], targets[:, 2])
+        loss = w1 * loss1 + w2 * loss2 + w3 * loss3
+        
+        # 记录测试损失
+        self.test_loss_metric(loss)
+
+        # Spearman 计算
+        sr_val_1 = self.test_sr_metric_1(pred_dict["task1_pred"].squeeze(), targets[:, 0])
+        sr_val_2 = self.test_sr_metric_2(pred_dict["task2_pred"].squeeze(), targets[:, 1])
+        sr_val_3 = self.test_sr_metric_3(pred_dict["task3_pred"].squeeze(), targets[:, 2])
+        avg_sr = (sr_val_1 + sr_val_2 + sr_val_3) / 3
+
+        # Logging: Lightning 会自动聚合这些日志
+        self.log("test_loss", self.test_loss_metric, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("test_sr", avg_sr, on_step=False, on_epoch=True, prog_bar=True)
+
+        return loss  # 也可以返回字典，Lightning 会自动汇总
+
+    # def on_test_epoch_end(self):
+        """
+        在测试集所有 batch 执行完之后自动调用。
+        这里拿 metric 计算最终值, 做打印或 self.log 皆可。
+        """
+        avg_test_loss = self.test_loss_metric.compute()
+        avg_sr_1 = self.test_sr_metric_1.compute()
+        avg_sr_2 = self.test_sr_metric_2.compute()
+        avg_sr_3 = self.test_sr_metric_3.compute()
+
+        avg_sr = (avg_sr_1 + avg_sr_2 + avg_sr_3) / 3
+
+        # 可选：log 到 Lightning (TensorBoard, CSV, etc.)
+        # on_test_epoch_end 是测试阶段 => 'test' scope => 会用 "test_*" 命名空间
+        self.log("final_test_loss", avg_test_loss, prog_bar=True)
+        self.log("final_test_sr", avg_sr, prog_bar=True)
+
+        # 也可以直接 print 出来
+        # print(f"[TEST] Average Loss: {avg_test_loss:.4f}, Spearman: {avg_sr:.4f}")
+
+        # 清空 metric state (如果你下一次 test 还要用同一个模块)
+        self.test_loss_metric.reset()
+        self.test_sr_metric_1.reset()
+        self.test_sr_metric_2.reset()
+        self.test_sr_metric_3.reset()
+
+
     def on_train_end(self):
         """ 训练结束时打印最小 train_loss """
         self._log.info(f"Best train loss during training: {self.best_train_loss:.6f}")

@@ -5,7 +5,7 @@ import numpy as np
 import logging
 import os
 import torch
-from torch.utils.data import Dataset,DataLoader,WeightedRandomSampler
+from torch.utils.data import Dataset,DataLoader,WeightedRandomSampler,random_split
 import logging
 from tqdm import tqdm
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
@@ -34,6 +34,8 @@ class my_data_module(LightningDataModule):
         self._log = logging.getLogger(__name__)
         self._pin_memory=self._task_cfg.pin_memory
         self._smoothing_params = self._task_cfg.smoothing_params
+        self._val_ratio = self._task_cfg.val_ratio
+        self._test_ratio = self._task_cfg.test_ratio
 
 
     def _encode(self,seq):
@@ -130,8 +132,24 @@ class my_data_module(LightningDataModule):
         else:
             self.setup_smoothed()
 
+        dataset_len = len(self._dataset)
+        val_len = int(self._val_ratio * dataset_len)
+        test_len = int(self._test_ratio * dataset_len)
+        train_len = dataset_len - val_len - test_len
+
+        self._train_dataset, self._val_dataset, self._test_dataset = random_split(
+            self._dataset,
+            [train_len, val_len, test_len],
+            generator=torch.Generator().manual_seed(self._seed)
+        )
+
+        self._log.info(f"Total samples = {dataset_len}, "
+                       f"train = {train_len}, val = {val_len}, test = {test_len}")
+
+
+
         self._log.info(f"Use weighted sampling")
-        targets = [item[1] for item in self._dataset]  # (x[1], y, z)
+        targets = [item[1] for item in self._train_dataset]  # (x[1], y, z)
         targets = np.array(targets)  # 转换为 numpy 数组，形状 (N, 3)
 
         # 方法1: 取 target 平均值
@@ -155,14 +173,39 @@ class my_data_module(LightningDataModule):
 
     def train_dataloader(self):
         return DataLoader(
-            self._dataset,
+            self._train_dataset,
             batch_size = self._batch_size,
             num_workers = self._num_workers,
             pin_memory = self._pin_memory,
             sampler = self._sampler
         )
 
-        
+    def val_dataloader(self):
+        """
+        通常验证集/测试集只需要 SequentialSampler (默认) 即可
+        """
+        if self._val_dataset is None or len(self._val_dataset) == 0:
+            return None  
+        return DataLoader(
+            self._val_dataset,
+            batch_size=self._batch_size,
+            shuffle=False,
+            num_workers=self._num_workers,
+            pin_memory=self._pin_memory
+        )
+    
+    def test_dataloader(self):
+        if self._test_dataset is None or len(self._test_dataset) == 0:
+            return None
+        return DataLoader(
+            self._test_dataset,
+            batch_size=self._batch_size,
+            shuffle=False,
+            num_workers=self._num_workers,
+            pin_memory=self._pin_memory
+        )
+    
+
 
 class my_dataset(Dataset):
     def __init__(
