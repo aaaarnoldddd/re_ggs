@@ -255,10 +255,22 @@ class MTL_Module(LightningModule):
         self.test_sr_metric_3 = SpearmanCorrCoef()
         self._log = logging.getLogger(__name__)
         self.best_train_loss = float('inf')
+
+        self.mean = None
+        self.std = None
     
     def forward(self, x):
         return self.model(x)
     
+    # def on_train_start(self):
+    #     """当训练开始时，获取 DataModule 计算的 mean 和 std"""
+    #     datamodule = self.trainer.datamodule  # 获取当前绑定的 DataModule
+    #     if datamodule is not None:
+    #         self.mean = torch.tensor(datamodule.mean, device=self.device)  # 转换为 tensor
+    #         self.std = torch.tensor(datamodule.std, device=self.device)  # 转换为 tensor
+    #         self._log.info(f"[MTL_Module] Loaded mean: {self.mean}, std: {self.std}")
+
+
     def training_step(self, batch, batch_idx):
         features, targets = batch  # 假设 batch 为 (features, targets)
         pred = self.forward(features)
@@ -266,7 +278,7 @@ class MTL_Module(LightningModule):
         targets = targets.transpose(0, 1)
         pred_mse = torch.concat([pred[f"task{i+1}_pred"] for i in range(self.mcfg.num_tasks)], dim=1)
 
-        w1, w2, w3 = 0.6, 0.2, 0.2
+        w1, w2, w3 = 0.4, 0.3, 0.3
 
         loss1 = self.criterion(pred_mse[:, 0], targets[:, 0])
         loss2 = self.criterion(pred_mse[:, 1], targets[:, 1])
@@ -307,7 +319,7 @@ class MTL_Module(LightningModule):
         preds = torch.cat([pred_dict[f"task{i+1}_pred"] for i in range(self.mcfg.num_tasks)], dim=1)
         targets = torch.stack([torch.tensor(t) for t in targets]).transpose(0, 1)
 
-        w1, w2, w3 = 0.6, 0.2, 0.2
+        w1, w2, w3 = 0.4, 0.3, 0.3
         loss1 = self.criterion(preds[:, 0], targets[:, 0])
         loss2 = self.criterion(preds[:, 1], targets[:, 1])
         loss3 = self.criterion(preds[:, 2], targets[:, 2])
@@ -338,7 +350,7 @@ class MTL_Module(LightningModule):
         preds = torch.cat([pred_dict[f"task{i+1}_pred"] for i in range(self.mcfg.num_tasks)], dim=1)
         targets = torch.stack([torch.tensor(t) for t in targets]).transpose(0, 1)
 
-        w1, w2, w3 = 0.6, 0.2, 0.2
+        w1, w2, w3 = 0.4, 0.3, 0.3
         loss1 = self.criterion(preds[:, 0], targets[:, 0])
         loss2 = self.criterion(preds[:, 1], targets[:, 1])
         loss3 = self.criterion(preds[:, 2], targets[:, 2])

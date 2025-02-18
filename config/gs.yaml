@@ -4,7 +4,7 @@ defaults:
   - global_paths: default.yaml
 
 ckpt_file: last.ckpt
-max_n_seqs: 250_000
+max_n_seqs: 500
 smoothing_method: tik-gamma-10
 exploration_method: ham1
 epoch: 10

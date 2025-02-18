@@ -36,6 +36,8 @@ class my_data_module(LightningDataModule):
         self._smoothing_params = self._task_cfg.smoothing_params
         self._val_ratio = self._task_cfg.val_ratio
         self._test_ratio = self._task_cfg.test_ratio
+        self.mean = None
+        self.std = None
 
 
     def _encode(self,seq):
@@ -152,6 +154,9 @@ class my_data_module(LightningDataModule):
         targets = [item[1] for item in self._train_dataset]  # (x[1], y, z)
         targets = np.array(targets)  # 转换为 numpy 数组，形状 (N, 3)
 
+        self.mean = np.mean(targets, axis=0)  # shape: (3,)
+        self.std = np.std(targets, axis=0)  # shape: (3,)
+
         # 方法1: 取 target 平均值
         # combined_targets = targets.mean(axis=1)  
 
@@ -177,7 +182,7 @@ class my_data_module(LightningDataModule):
             batch_size = self._batch_size,
             num_workers = self._num_workers,
             pin_memory = self._pin_memory,
-            sampler = self._sampler
+            # sampler = self._sampler
         )
 
     def val_dataloader(self):
