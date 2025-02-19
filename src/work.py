@@ -20,6 +20,8 @@ from tqdm import tqdm
 import sys
 import pickle as pkl
 from collections import defaultdict
+from pytorch_lightning import Trainer
+
 
 import matplotlib.pyplot as plt
 from collections import Counter
@@ -36,6 +38,7 @@ pyrootutils.setup_root(
 
 from utils import get_sol_entrance, get_ogt_entrance
 from src.model import MTL_Module
+from src.data import my_data_module, fine_tune_dataset
 
 device = torch.device("cuda")
 
@@ -62,13 +65,11 @@ def mutate(sequences, max_n_seqs, my_random):
             new_seqs.append(new_seq)
     return new_seqs
 
-def get_preds(sequences, batch_size):
-    ckpt_path = "ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_16_2025_16_35/last.ckpt"
-    train_config_path = "ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_16_2025_14_36/config.yaml"
-
+def get_predictor(ckpt_path = "ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_16_2025_16_35/last.ckpt", train_config_path = "ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_16_2025_14_36/config.yaml"
+):
     with open(train_config_path, 'r') as fp:
         train_config = OmegaConf.load(fp.name)
-    num_tasks = train_config.model.mtl.num_tasks
+    # num_tasks = train_config.model.mtl.num_tasks
     predictor = MTL_Module.load_from_checkpoint(
         checkpoint_path=ckpt_path,
         mcfg=train_config.model.mtl,
@@ -76,6 +77,24 @@ def get_preds(sequences, batch_size):
     )
     predictor.to(device).eval()
     log.info(f"Model parameters have been resumed from the checkpoint.")
+    return predictor
+
+
+
+def get_preds(sequences, batch_size, predictor):
+    # ckpt_path = "ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_16_2025_16_35/last.ckpt"
+    # train_config_path = "ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_16_2025_14_36/config.yaml"
+
+    # with open(train_config_path, 'r') as fp:
+    #     train_config = OmegaConf.load(fp.name)
+    # num_tasks = train_config.model.mtl.num_tasks
+    # predictor = MTL_Module.load_from_checkpoint(
+    #     checkpoint_path=ckpt_path,
+    #     mcfg=train_config.model.mtl,
+    #     ocfg=train_config.model.optimizer
+    # )
+    # predictor.to(device).eval()
+    # log.info(f"Model parameters have been resumed from the checkpoint.")
 
     encoded_seqs = [torch.from_numpy(encode(x)) for x in tqdm(sequences, desc="encoding", total=len(sequences), leave=True)]
     encoded_seqs = torch.stack(encoded_seqs).to(device)
@@ -86,7 +105,7 @@ def get_preds(sequences, batch_size):
     with torch.no_grad():
         for batch in tqdm(batchs, desc="calculate scores", total=len(batchs)):
             tmp = predictor(batch)
-            pre_scores.append(torch.concat([tmp[f"task{i+1}_pred"] for i in range(num_tasks)], dim=1))
+            pre_scores.append(torch.concat([tmp[f"task{i+1}_pred"] for i in range(3)], dim=1))
         pre_scores = torch.concat(pre_scores)
 
     return pre_scores
@@ -227,6 +246,7 @@ def get_convex(sequences, wt_seq, pred_score, sol, ogt,
     query_batch = []
     query_sol   = []
     query_ogt   = []
+    query_score = []
 
     while len(query_batch) < num_queries:
         # Compute the proximal frontier by Andrew's monotone chain
@@ -262,6 +282,7 @@ def get_convex(sequences, wt_seq, pred_score, sol, ogt,
                     query_batch.append(chosen['sequence'])
                     query_sol.append(chosen['sol'])
                     query_ogt.append(chosen['ogt'])
+                    query_score.append(chosen['model_score'])
                     
                     # 从该距离组移除
                     candidate_pool_dict[dist].pop(0)
@@ -273,7 +294,7 @@ def get_convex(sequences, wt_seq, pred_score, sol, ogt,
         if empty_check:
             break
 
-    return query_batch, np.array(query_sol), np.array(query_ogt)
+    return query_batch, np.array(query_score), np.array(query_sol), np.array(query_ogt)
 
 def select_batch(query_batch, pred_c, T_init=1.0, n_iter=1000, cooling=None, return_mode='chain'):
     """
@@ -364,6 +385,38 @@ def select_batch(query_batch, pred_c, T_init=1.0, n_iter=1000, cooling=None, ret
     else:
         raise ValueError(f"未知 return_mode: {return_mode}")
 
+def update_predictor(seqs, score, sol, ogt, ckpt_path = "ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_16_2025_16_35/last.ckpt", train_config_path = "ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_16_2025_14_36/config.yaml"):
+    with open(train_config_path, 'r') as fp:
+        train_config = OmegaConf.load(fp.name)
+
+    pred_module = MTL_Module(
+        mcfg=train_config.model.mtl,
+        ocfg=train_config.model.optimizer
+        )
+    callbacks_module = hydra.utils.instantiate(train_config.callbacks)
+
+    def encode(seq):
+        alphabet = "ARNDCQEGHILKMFPSTWYV"
+        encoded_seq = np.array([alphabet.index(x) for x in seq])
+        return encoded_seq
+    
+    dataset = []
+    for s, sc, so, og in zip(seqs, score, sol, ogt):
+        enc = encode(s) 
+        val_tuple = (np.float32(sc), np.float32(so), np.float32(og))
+        dataset.append((enc, val_tuple))
+
+    task_cfg = train_config.experiment.gfp
+    
+    data_module = fine_tune_dataset(data = dataset, task_cfg = task_cfg, **train_config.data)
+
+    trainer = Trainer(**train_config.trainer, devices=[torch.cuda.current_device()], callbacks=callbacks_module)
+    trainer.fit(model=pred_module, 
+                datamodule=data_module,
+                ckpt_path=ckpt_path)
+    predictor = get_predictor()
+    return predictor
+    
 
 
 
@@ -377,25 +430,52 @@ def main(cfg):
     my_random = random.Random(cfg.experiment.random_seed)
     raw_data = pd.read_csv("data/GFP/mutant_7_percentile_0.0_0.3/filtered_dataset_with_ogtsol.csv")
     sequences = [x for x in raw_data.sequence]
-    for _ in range(cfg.epoch):
+    updated_seqs = []
+    updated_score = []
+    updated_sol = []
+    updated_ogt = []
+
+    predictor = get_predictor()
+
+    for epoch in range(cfg.epoch):
         sequences = mutate(sequences, cfg.max_n_seqs, my_random)
-        preds = get_preds(sequences, batch_size=128).cpu().numpy()
+        preds = get_preds(sequences, batch_size=128, predictor=predictor).cpu().numpy()
 
         pred_score = np.array([x[0] for x in preds])
         pred_sol = np.array([x[1] for x in preds])
         pred_ogt = np.array([x[2] for x in preds])
 
-        query_batch, pred_sol, pred_ogt = get_convex(sequences, wt_seq, pred_score, pred_sol, pred_ogt, batch_size=64, num_queries=120)
+        query_batch, pred_score, pred_sol, pred_ogt = get_convex(sequences, wt_seq, pred_score, pred_sol, pred_ogt, batch_size=64, num_queries=120)
 
         pred_c = process(pred_sol, pred_ogt, wt_sol, wt_ogt)
         
         selected_batch = select_batch(query_batch, pred_c)
 
-        # new_seqs = selecet_batch(query_batch, pred_c)
-
         # verify_and_plot_frontier(sequences, wt_seq, pred_score, query_batch)
-        x=5
+        
+        seq_map = {}
+        for i, seq in enumerate(query_batch):
+            seq_map[seq] = i  
+        
+        selected_sol = []
+        selected_ogt = []
+        selected_score = []
+        for sb_seq in selected_batch:
+            idx = seq_map[sb_seq]  # 一对一
+            selected_sol.append(pred_sol[idx])
+            selected_ogt.append(pred_ogt[idx])
+            selected_score.append(pred_score[idx])
 
+        updated_seqs.append(selected_batch)
+        updated_score.append(selected_score)
+        updated_sol.append(selected_sol)
+        updated_ogt.append(selected_ogt)
+
+        sequences = selected_batch.copy()
+
+        if (epoch+1)%10==0:
+            predictor = update_predictor(updated_seqs, updated_score, updated_sol, updated_ogt)
+        
 
 
 

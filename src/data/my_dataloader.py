@@ -165,8 +165,8 @@ class my_data_module(LightningDataModule):
 
         # 方法3: 自定义加权平均 (调整 a, b, c)
         a, b, c = 0.6, 0.2, 0.2  # 你可以调整权重
-        sum = targets.sum(axis=0)
-        targets = targets/sum
+        val_sum = targets.sum(axis=0)
+        targets = targets/val_sum
         combined_targets = a * targets[:, 0] + b * targets[:, 1] + c * targets[:, 2]
 
         # 计算采样权重
@@ -331,3 +331,95 @@ class my_dataset(Dataset):
         self._data = self._data.drop_duplicates(subset=['sequence'], ignore_index=True)
         added_num_seqs = len(self._data) - prev_num_seqs
         self._log.info(f"Added {added_num_seqs} sequences.")
+
+class fine_tune_dataset(LightningDataModule):
+    def __init__(
+            self,
+            *,
+            task_cfg,
+            batch_size,
+            num_workers,
+            seed,
+            alphabet,
+            weighted_sampling,
+            data
+    ):
+        super().__init__()
+        self._task_cfg=task_cfg
+        self._batch_size = batch_size
+        self._num_workers = num_workers
+        self._seed = seed
+        self._weighted_sampling = weighted_sampling
+        self._alphabet = alphabet
+        self._log = logging.getLogger(__name__)
+        self._pin_memory=self._task_cfg.pin_memory
+        self._smoothing_params = self._task_cfg.smoothing_params
+        self._val_ratio = self._task_cfg.val_ratio
+        self._test_ratio = 0
+        self.mean = None
+        self.std = None
+        self._dataset = data
+    
+    def setup(self, stage=None):
+        dataset_len = len(self._dataset)
+        val_len = int(self._val_ratio * dataset_len)
+        test_len = int(self._test_ratio * dataset_len)
+        train_len = dataset_len - val_len - test_len
+
+        self._train_dataset, self._val_dataset, self._test_dataset = random_split(
+            self._dataset,
+            [train_len, val_len, test_len],
+            generator=torch.Generator().manual_seed(self._seed)
+        )
+
+        # self._log.info(f"Total samples = {dataset_len}, "
+        #                f"train = {train_len}, val = {val_len}, test = {test_len}")
+
+        # self._log.info(f"Use weighted sampling")
+        targets = [item[1] for item in self._train_dataset]  # (x[1], y, z)
+        targets = np.array(targets)  # 转换为 numpy 数组，形状 (N, 3)
+
+        self.mean = np.mean(targets, axis=0)  # shape: (3,)
+        self.std = np.std(targets, axis=0)  # shape: (3,)
+
+        # 方法1: 取 target 平均值
+        # combined_targets = targets.mean(axis=1)  
+
+        # 方法2: 取最大值
+        # combined_targets = targets.max(axis=1)
+
+        # 方法3: 自定义加权平均 (调整 a, b, c)
+        a, b, c = 0.6, 0.2, 0.2  # 你可以调整权重
+        val_sum = targets.sum(axis=0)
+        targets = targets/val_sum
+        combined_targets = a * targets[:, 0] + b * targets[:, 1] + c * targets[:, 2]
+
+        # 计算采样权重
+        adjusted_targets = combined_targets - combined_targets.min() + 1  # 避免除 0
+        weights = 1 / adjusted_targets  # 目标值越大，权重越小（即越容易被采样）
+
+        # 创建 WeightedRandomSampler
+        self._sampler = WeightedRandomSampler(weights, len(weights))
+        
+    def train_dataloader(self):
+        return DataLoader(
+            self._train_dataset,
+            batch_size = self._batch_size,
+            num_workers = self._num_workers,
+            pin_memory = self._pin_memory,
+            # sampler = self._sampler
+        )
+
+    def val_dataloader(self):
+        if self._val_dataset is None or len(self._val_dataset) == 0:
+            return None  
+        return DataLoader(
+            self._val_dataset,
+            batch_size=self._batch_size,
+            shuffle=False,
+            num_workers=self._num_workers,
+            pin_memory=self._pin_memory
+        )
+    
+
+    
