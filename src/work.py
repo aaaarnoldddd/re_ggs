@@ -21,6 +21,7 @@ import sys
 import pickle as pkl
 from collections import defaultdict
 from pytorch_lightning import Trainer
+from numpy.linalg import norm
 
 
 import matplotlib.pyplot as plt
@@ -47,18 +48,24 @@ def encode(seq):
     encoded_seq = np.array([alphabet.index(x) for x in seq],dtype=np.float32)
     return encoded_seq
 
-def mutate(sequences, max_n_seqs, my_random):
-    alphabet = "ARNDCQEGHILKMFPSTWYV"
+def mutate(sequences, max_n_seqs, my_random, cos_mt, alphabet):
     tot = 0
     set_seqs = set(sequences)
     new_seqs = []
     while tot<max_n_seqs:
-        x = my_random.randint(0, len(sequences)-1)
-        pos = my_random.randint(0, len(sequences[0])-1)
-        to = my_random.choice(alphabet)
-        new_seq = list(sequences[x])
-        new_seq[pos] = to
-        new_seq = ''.join(new_seq)
+        x = my_random.randint(0, len(sequences) - 1)
+        seq_list = list(sequences[x])
+
+        pos = my_random.randint(0, len(seq_list) - 1)
+
+        orig_aa = seq_list[pos]
+        i = alphabet.index(orig_aa)
+
+        new_aa = my_random.choices(population=alphabet, weights=cos_mt[i], k=1)[0]
+
+        seq_list[pos] = new_aa
+        new_seq = ''.join(seq_list)
+
         if new_seq not in set_seqs:
             set_seqs.add(new_seq)
             tot+=1
@@ -78,8 +85,6 @@ def get_predictor(ckpt_path = "ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/0
     predictor.to(device).eval()
     log.info(f"Model parameters have been resumed from the checkpoint.")
     return predictor
-
-
 
 def get_preds(sequences, batch_size, predictor):
     # ckpt_path = "ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_16_2025_16_35/last.ckpt"
@@ -489,6 +494,28 @@ def graph_smoothing(pred_score, seqs, cfg):
     fine_tuned_score, _ = cg(tmp, pred_score)
     return fine_tuned_score
 
+def get_graph(graph_path):
+    df = pd.read_excel(graph_path, sheet_name=1)
+    alphabet = "".join(df["AA"])
+    attr_df = df.drop(columns=["AA"])
+    to_np = attr_df.values
+    n = to_np.shape[0]  # 通常是 20
+    cos_mt= []
+    for i in range(n):
+        vec_i = to_np[i]
+        norm_i = norm(vec_i)
+        row_list = []
+        for j in range(n):
+            vec_j = to_np[j]
+            norm_j = norm(vec_j)
+            dot_ij = np.dot(vec_i, vec_j)
+            # 加 1e-8 避免分母为 0
+            cos_ij = dot_ij / (norm_i * norm_j + 1e-8)
+            row_list.append(cos_ij)
+        cos_mt.append(row_list)
+
+    return cos_mt, alphabet
+
 
 @hydra.main(version_base=None , config_path="../config" , config_name="gs.yaml")
 def main(cfg):
@@ -502,13 +529,12 @@ def main(cfg):
     sequences = [x for x in raw_data.sequence]
     updated_seqs = []
     updated_score = []
-    updated_sol = []
-    updated_ogt = []
 
     predictor = get_predictor()
+    cos_mt, alphabet = get_graph(graph_path="data/AAgraph.xlsx")
 
     for epoch in range(cfg.epoch):
-        sequences = mutate(sequences, cfg.max_n_seqs, my_random)
+        sequences = mutate(sequences, cfg.max_n_seqs, my_random, cos_mt, alphabet)
         preds = get_preds(sequences, batch_size=128, predictor=predictor).cpu().numpy()
 
         pred_score = np.array([x[0] for x in preds])
