@@ -1,0 +1,23 @@
+[2025-02-21 15:32:06,408][__main__][INFO] - Model parameters have been resumed from the checkpoint.
+[2025-02-21 15:32:06,508][__main__][INFO] - KNN graph is done
+[2025-02-21 15:32:06,510][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:32:06,622][__main__][INFO] - KNN graph is done
+[2025-02-21 15:32:06,624][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:32:06,715][__main__][INFO] - KNN graph is done
+[2025-02-21 15:32:06,717][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:32:06,800][__main__][INFO] - KNN graph is done
+[2025-02-21 15:32:06,801][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:32:06,892][__main__][INFO] - KNN graph is done
+[2025-02-21 15:32:06,893][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:32:06,968][__main__][INFO] - KNN graph is done
+[2025-02-21 15:32:06,969][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:32:07,078][__main__][INFO] - KNN graph is done
+[2025-02-21 15:32:07,080][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:32:07,174][__main__][INFO] - KNN graph is done
+[2025-02-21 15:32:07,175][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:32:07,253][__main__][INFO] - KNN graph is done
+[2025-02-21 15:32:07,255][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:32:07,331][__main__][INFO] - KNN graph is done
+[2025-02-21 15:32:07,332][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:32:16,859][src.model.mtl_predicotor][INFO] - Best train loss during training: 2.003008
+[2025-02-21 15:32:16,973][__main__][INFO] - Model parameters have been resumed from the checkpoint.

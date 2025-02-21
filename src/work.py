@@ -65,7 +65,7 @@ def mutate(sequences, max_n_seqs, my_random):
             new_seqs.append(new_seq)
     return new_seqs
 
-def get_predictor(ckpt_path = "ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_16_2025_16_35/last.ckpt", train_config_path = "ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_16_2025_14_36/config.yaml"
+def get_predictor(ckpt_path = "ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_16_2025_14_36/last.ckpt", train_config_path = "ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_16_2025_14_36/config.yaml"
 ):
     with open(train_config_path, 'r') as fp:
         train_config = OmegaConf.load(fp.name)
@@ -296,7 +296,7 @@ def get_convex(sequences, wt_seq, pred_score, sol, ogt,
 
     return query_batch, np.array(query_score), np.array(query_sol), np.array(query_ogt)
 
-def select_batch(query_batch, pred_c, T_init=1.0, n_iter=1000, cooling=None, return_mode='chain'):
+def select_batch(query_batch, pred_c, T_init=1.0, n_iter=10, cooling=None, return_mode='chain'):
     """
     对 query_batch 做 Metropolis MCMC 策略的“拒绝–接受”筛选。
     相比一次性抽样，这里通过多轮迭代(随机提案)来保留更多多样性。
@@ -385,7 +385,7 @@ def select_batch(query_batch, pred_c, T_init=1.0, n_iter=1000, cooling=None, ret
     else:
         raise ValueError(f"未知 return_mode: {return_mode}")
 
-def update_predictor(seqs, score, sol, ogt, ckpt_path = "ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_16_2025_16_35/last.ckpt", train_config_path = "ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_16_2025_14_36/config.yaml"):
+def update_predictor(tot, seqs, score, sol, ogt, ckpt_path = "ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_16_2025_14_36/last.ckpt", train_config_path = "ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_16_2025_14_36/config.yaml"):
     with open(train_config_path, 'r') as fp:
         train_config = OmegaConf.load(fp.name)
 
@@ -414,10 +414,80 @@ def update_predictor(seqs, score, sol, ogt, ckpt_path = "ckpt/GFP/mutant_7/perce
     trainer.fit(model=pred_module, 
                 datamodule=data_module,
                 ckpt_path=ckpt_path)
-    predictor = get_predictor()
-    return predictor
     
+    base, ext = os.path.splitext(ckpt_path)
+    new_ckpt_path = f"{base}-v{int(tot)}{ext}"
+    predictor = get_predictor(ckpt_path=new_ckpt_path)
+    return predictor
 
+def levenshtein_knn(x_train, x_test, K, batch_size=1000):
+    x_train = x_train.to(device)
+    x_test = x_test.to(device)
+
+    def levenshtein_distance(seq1, seq2):
+        return torch.sum(seq1 != seq2, dim=-1)
+
+    vals_list = []
+    indices_list = []
+
+    for i in tqdm(range(0, x_test.size(0), batch_size), desc="Processing Batches", unit="batch"):
+        x_test_batch = x_test[i : i + batch_size]  
+
+        dists = torch.zeros(x_test_batch.size(0), x_train.size(0), device=device)
+
+        for j in range(x_train.size(0)):
+            dists[:, j] = levenshtein_distance(x_test_batch, x_train[j])  
+
+        vals, indices = torch.topk(dists, K, dim=1, largest=False) 
+        vals_list.append(vals.cpu())
+        indices_list.append(indices.cpu())
+
+    vals = torch.cat(vals_list, dim=0)
+    indices = torch.cat(indices_list, dim=0)
+
+    return vals.numpy(), indices.numpy()
+
+def minimum(A, B):
+    BisBigger = A-B
+    BisBigger.data = np.where(BisBigger.data > 0, 1, 0)
+    return A - A.multiply(BisBigger) + B.multiply(BisBigger)
+
+def graph_smoothing(pred_score, seqs, cfg):
+    encoded_seqs = [torch.from_numpy(encode(x)) for x in tqdm(seqs, desc="encoding", total=len(seqs), leave=True)]
+    encoded_seqs = torch.stack(encoded_seqs).to(device)
+    vals, indices = levenshtein_knn(encoded_seqs, encoded_seqs, K = int(np.floor(np.sqrt(len(seqs)) + 1)), batch_size = 1000)
+
+    log.info(f"KNN graph is done")
+
+    vals = vals[:, 1:]
+    indices = indices[:, 1:]
+
+    # print(vals.shape)
+    # print(indices.shape)
+
+    # print(vals[:5])
+    # print(indices[:5])
+
+    non_mutal_mat = csr_matrix(
+        (
+        vals.flatten(),
+        indices.flatten(),
+        np.arange(0, len(vals.flatten())+1, len(vals[0]))
+        ),
+        shape=(len(vals), len(vals))
+        )
+    
+    # print(non_mutal_mat.shape)
+    mutal_mat = minimum(non_mutal_mat, non_mutal_mat.T)
+
+    log.info('Computing Laplacian..')
+    L = laplacian(mutal_mat, normed=True).tocsr()    
+    gamma = float((cfg.smoothing_method).split('-')[-1])
+    # print(f"gamma={gamma}")
+    I = identity(L.shape[0], format='csr')
+    tmp = I + gamma * L
+    fine_tuned_score, _ = cg(tmp, pred_score)
+    return fine_tuned_score
 
 
 @hydra.main(version_base=None , config_path="../config" , config_name="gs.yaml")
@@ -442,6 +512,7 @@ def main(cfg):
         preds = get_preds(sequences, batch_size=128, predictor=predictor).cpu().numpy()
 
         pred_score = np.array([x[0] for x in preds])
+        pred_score = graph_smoothing(pred_score, sequences, cfg)
         pred_sol = np.array([x[1] for x in preds])
         pred_ogt = np.array([x[2] for x in preds])
 
@@ -457,24 +528,28 @@ def main(cfg):
         for i, seq in enumerate(query_batch):
             seq_map[seq] = i  
         
-        selected_sol = []
-        selected_ogt = []
+        # selected_sol = []
+        # selected_ogt = []
         selected_score = []
         for sb_seq in selected_batch:
             idx = seq_map[sb_seq]  # 一对一
-            selected_sol.append(pred_sol[idx])
-            selected_ogt.append(pred_ogt[idx])
+            # selected_sol.append(pred_sol[idx])
+            # selected_ogt.append(pred_ogt[idx])
             selected_score.append(pred_score[idx])
 
-        updated_seqs.append(selected_batch)
-        updated_score.append(selected_score)
-        updated_sol.append(selected_sol)
-        updated_ogt.append(selected_ogt)
+        updated_seqs+=selected_batch
+        updated_score+=selected_score
+        # updated_sol+=selected_sol
+        # updated_ogt+=selected_ogt
 
         sequences = selected_batch.copy()
 
-        if (epoch+1)%10==0:
-            predictor = update_predictor(updated_seqs, updated_score, updated_sol, updated_ogt)
+        if (epoch+1)%5==0:
+            updated_sol = np.array(get_sol_entrance(updated_seqs))
+            updated_ogt = np.array(get_ogt_entrance(updated_seqs))
+            predictor = update_predictor((epoch+1)/5, updated_seqs, updated_score, updated_sol, updated_ogt)
+            updated_seqs = []
+            updated_score = []
         
 
 

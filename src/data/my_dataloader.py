@@ -337,6 +337,8 @@ class fine_tune_dataset(LightningDataModule):
             self,
             *,
             task_cfg,
+            task,
+            sequence_column,
             batch_size,
             num_workers,
             seed,

@@ -43,7 +43,7 @@ callbacks:
   save_last: true
   save_on_train_epoch_end: true
 trainer:
-  max_epochs: 150
+  max_epochs: 160
   accelerator: gpu
   log_every_n_steps: 1
 global_paths:

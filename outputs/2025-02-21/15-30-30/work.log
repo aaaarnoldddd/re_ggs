@@ -1,0 +1,21 @@
+[2025-02-21 15:31:03,675][__main__][INFO] - Model parameters have been resumed from the checkpoint.
+[2025-02-21 15:31:03,814][__main__][INFO] - KNN graph is done
+[2025-02-21 15:31:03,815][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:31:03,891][__main__][INFO] - KNN graph is done
+[2025-02-21 15:31:03,893][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:31:03,979][__main__][INFO] - KNN graph is done
+[2025-02-21 15:31:03,981][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:31:04,053][__main__][INFO] - KNN graph is done
+[2025-02-21 15:31:04,054][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:31:04,120][__main__][INFO] - KNN graph is done
+[2025-02-21 15:31:04,121][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:31:04,190][__main__][INFO] - KNN graph is done
+[2025-02-21 15:31:04,192][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:31:04,260][__main__][INFO] - KNN graph is done
+[2025-02-21 15:31:04,262][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:31:04,336][__main__][INFO] - KNN graph is done
+[2025-02-21 15:31:04,337][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:31:04,452][__main__][INFO] - KNN graph is done
+[2025-02-21 15:31:04,454][__main__][INFO] - Computing Laplacian..
+[2025-02-21 15:31:04,550][__main__][INFO] - KNN graph is done
+[2025-02-21 15:31:04,551][__main__][INFO] - Computing Laplacian..
