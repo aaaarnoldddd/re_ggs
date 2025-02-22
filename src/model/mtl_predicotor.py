@@ -256,9 +256,22 @@ class MTL_Module(LightningModule):
         self._log = logging.getLogger(__name__)
         self.best_train_loss = float('inf')
 
+        # 定义三个可学习的 log variance 参数（对数不确定性）
+        self.log_vars = nn.Parameter(torch.zeros(mcfg.num_tasks))
+
         self.mean = None
         self.std = None
     
+    def on_fit_start(self):
+    # 如果 self.mean 还没有设置，则从 datamodule 获取
+        if self.mean is None or self.std is None:
+            dm = self.trainer.datamodule
+            if dm.mean is None or dm.std is None:
+                raise ValueError("DataModule's mean/std are not set.")
+            self.mean = torch.tensor(dm.mean, device=self.device, dtype=torch.float32)
+            self.std = torch.tensor(dm.std, device=self.device, dtype=torch.float32)
+
+
     def forward(self, x):
         return self.model(x)
     
@@ -278,14 +291,20 @@ class MTL_Module(LightningModule):
         targets = targets.transpose(0, 1)
         pred_mse = torch.concat([pred[f"task{i+1}_pred"] for i in range(self.mcfg.num_tasks)], dim=1)
 
-        w1, w2, w3 = 0.4, 0.3, 0.3
+        normalized_targets = (targets - self.mean) / (self.std + 1e-8)
 
-        loss1 = self.criterion(pred_mse[:, 0], targets[:, 0])
-        loss2 = self.criterion(pred_mse[:, 1], targets[:, 1])
-        loss3 = self.criterion(pred_mse[:, 2], targets[:, 2])
+        loss1 = self.criterion(pred_mse[:, 0], normalized_targets[:, 0])
+        loss2 = self.criterion(pred_mse[:, 1], normalized_targets[:, 1])
+        loss3 = self.criterion(pred_mse[:, 2], normalized_targets[:, 2])
 
-        # 这里直接线性组合
-        loss = w1 * loss1 + w2 * loss2 + w3 * loss3
+        precision1 = torch.exp(-self.log_vars[0])
+        precision2 = torch.exp(-self.log_vars[1])
+        precision3 = torch.exp(-self.log_vars[2])
+        
+        loss = (precision1 * loss1 + self.log_vars[0] +
+                precision2 * loss2 + self.log_vars[1] +
+                precision3 * loss3 + self.log_vars[2])
+        
         self.train_loss_metric(loss)
         self.log("train_loss", self.train_loss_metric, on_step=False, on_epoch=True, prog_bar=True)
 
@@ -315,15 +334,20 @@ class MTL_Module(LightningModule):
         """
         features, targets = batch
         pred_dict = self.forward(features)
-        
+        targets = torch.stack([torch.tensor(x) for x in targets])
+        targets = targets.transpose(0, 1)
         preds = torch.cat([pred_dict[f"task{i+1}_pred"] for i in range(self.mcfg.num_tasks)], dim=1)
-        targets = torch.stack([torch.tensor(t) for t in targets]).transpose(0, 1)
+        normalized_targets = (targets - self.mean) / (self.std + 1e-8)
 
-        w1, w2, w3 = 0.4, 0.3, 0.3
-        loss1 = self.criterion(preds[:, 0], targets[:, 0])
-        loss2 = self.criterion(preds[:, 1], targets[:, 1])
-        loss3 = self.criterion(preds[:, 2], targets[:, 2])
-        loss = w1 * loss1 + w2 * loss2 + w3 * loss3
+        loss1 = self.criterion(preds[:, 0], normalized_targets[:, 0])
+        loss2 = self.criterion(preds[:, 1], normalized_targets[:, 1])
+        loss3 = self.criterion(preds[:, 2], normalized_targets[:, 2])
+        precision1 = torch.exp(-self.log_vars[0])
+        precision2 = torch.exp(-self.log_vars[1])
+        precision3 = torch.exp(-self.log_vars[2])
+        loss = (precision1 * loss1 + self.log_vars[0] +
+                precision2 * loss2 + self.log_vars[1] +
+                precision3 * loss3 + self.log_vars[2])
         
         # 更新 val loss
         self.val_loss_metric(loss)
@@ -346,15 +370,20 @@ class MTL_Module(LightningModule):
         """
         features, targets = batch
         pred_dict = self.forward(features)
-
+        targets = torch.stack([torch.tensor(x) for x in targets])
+        targets = targets.transpose(0, 1)
         preds = torch.cat([pred_dict[f"task{i+1}_pred"] for i in range(self.mcfg.num_tasks)], dim=1)
-        targets = torch.stack([torch.tensor(t) for t in targets]).transpose(0, 1)
+        normalized_targets = (targets - self.mean) / (self.std + 1e-8)
 
-        w1, w2, w3 = 0.4, 0.3, 0.3
-        loss1 = self.criterion(preds[:, 0], targets[:, 0])
-        loss2 = self.criterion(preds[:, 1], targets[:, 1])
-        loss3 = self.criterion(preds[:, 2], targets[:, 2])
-        loss = w1 * loss1 + w2 * loss2 + w3 * loss3
+        loss1 = self.criterion(preds[:, 0], normalized_targets[:, 0])
+        loss2 = self.criterion(preds[:, 1], normalized_targets[:, 1])
+        loss3 = self.criterion(preds[:, 2], normalized_targets[:, 2])
+        precision1 = torch.exp(-self.log_vars[0])
+        precision2 = torch.exp(-self.log_vars[1])
+        precision3 = torch.exp(-self.log_vars[2])
+        loss = (precision1 * loss1 + self.log_vars[0] +
+                precision2 * loss2 + self.log_vars[1] +
+                precision3 * loss3 + self.log_vars[2])
         
         # 记录测试损失
         self.test_loss_metric(loss)

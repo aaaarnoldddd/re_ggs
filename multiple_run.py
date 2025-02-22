@@ -23,9 +23,12 @@ def multiple_runs_subprocess():
 
     with open(results_file, "w") as f:
         f.write("Experiment Results:\n")
-        f.write("kernel_size | input_size | dropout | num_experts | expert_units | gate_units | "
-                "tower_units | batch_norm | lr | weight_decay | net_dropout | Best Train Loss\n")
-        f.write("-" * 120 + "\n")
+        f.write(
+            f"{'kernel_size':<12} | {'input_size':<10} | {'dropout':<8} | {'num_experts':<11} | "
+            f"{'expert_units':<14} | {'gate_units':<12} | {'tower_units':<14} | {'batch_norm':<10} | "
+            f"{'lr':<8} | {'weight_decay':<12} | {'net_dropout':<10} | {'BestTrainLoss':<14} | {'TestLoss':<10}\n"
+        )
+        f.write("-" * 190 + "\n")
 
     for ks, inp, do, ne, eu, gu, tu, bn, lr, wd, nd in itertools.product(
         kernel_sizes, input_sizes, dropouts, num_experts, expert_hidden_units_list, 
@@ -67,6 +70,10 @@ def multiple_runs_subprocess():
             if match:
                 best_train_loss = float(match.group(1))
 
+            match_test = re.search(r"test_loss\s+([\d\.]+)", line)
+            if match_test:
+                test_loss = float(match_test.group(1))
+
         process.stdout.close()
         process.wait()
 
@@ -75,10 +82,9 @@ def multiple_runs_subprocess():
 
         with open(results_file, "a") as f:
             f.write(f"{ks:<12} | {inp:<10} | {do:<8} | {ne:<11} | {eu:<14} | {gu:<12} | "
-                    f"{tu:<14} | {bn:<10} | {lr:<8} | {wd:<12} | {nd:<10} | {best_train_loss}\n")
+                    f"{tu:<14} | {bn:<10} | {lr:<8} | {wd:<12} | {nd:<10} | {best_train_loss:<14} | {test_loss}\n")
 
-        print(f"Best train loss for [ks={ks}, inp={inp}, do={do}, ne={ne}, eu={eu}, gu={gu}, tu={tu}, bn={bn}, "
-              f"lr={lr}, wd={wd}, nd={nd}]: {best_train_loss}")
+        print(f"Results => Best train loss: {best_train_loss}, test_loss: {test_loss}") 
 
 if __name__ == "__main__":
     multiple_runs_subprocess()

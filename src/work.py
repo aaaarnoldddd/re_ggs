@@ -577,15 +577,5 @@ def main(cfg):
             updated_seqs = []
             updated_score = []
         
-
-
-
-
-
-
-
-
-
-
 if __name__=="__main__":
     main()

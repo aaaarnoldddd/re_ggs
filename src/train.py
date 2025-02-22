@@ -60,12 +60,12 @@ def main(cfg):
 
     log.info(f"The config file will be saved to {cfg_save_path}")
 
-    OmegaConf.save(cfg, cfg_save_path)
+    # OmegaConf.save(cfg, cfg_save_path)
 
     callbacks_module = hydra.utils.instantiate(cfg.callbacks)
 
-    trainer = Trainer(**cfg.trainer, callbacks = callbacks_module, devices=[torch.cuda.current_device()])
-    # trainer = Trainer(**cfg.trainer, devices=[torch.cuda.current_device()])
+    # trainer = Trainer(**cfg.trainer, callbacks = callbacks_module, devices=[torch.cuda.current_device()])
+    trainer = Trainer(**cfg.trainer, devices=[torch.cuda.current_device()])
 
     log.info(f"Now start training!")
 

@@ -1,0 +1,10 @@
+[2025-02-22 14:19:34,774][__main__][INFO] - The config file will be saved to /home/wangqy/Documents/python_test/ckpt/GFP/mutant_7/percentile_0.0_0.3/unsmoothed/02_22_2025_14_19/config.yaml
+[2025-02-22 14:19:34,816][__main__][INFO] - Now start training!
+[2025-02-22 14:19:34,817][src.data.my_dataloader][INFO] - Start preparing dataset
+[2025-02-22 14:19:34,894][src.data.my_dataloader][INFO] - Read in 2426 smoothed sequences.
+[2025-02-22 14:19:34,894][src.data.my_dataloader][INFO] - Total samples = 2426, train = 1699, val = 485, test = 242
+[2025-02-22 14:19:34,894][src.data.my_dataloader][INFO] - Use weighted sampling
+[2025-02-22 14:20:25,872][src.data.my_dataloader][INFO] - Start preparing dataset
+[2025-02-22 14:20:25,962][src.data.my_dataloader][INFO] - Read in 2426 smoothed sequences.
+[2025-02-22 14:20:25,963][src.data.my_dataloader][INFO] - Total samples = 2426, train = 1699, val = 485, test = 242
+[2025-02-22 14:20:25,963][src.data.my_dataloader][INFO] - Use weighted sampling
